@@ -1,0 +1,19 @@
+[
+  '{{repeat(5, 10)}}',
+  {
+    _id: '{{objectId()}}',
+    title: '{{lorem(1, "words")}}',
+    created: '{{date(new Date(2014, 0, 1), new Date(), "YYYY-MM-ddThh:mm:ss Z")}}',
+    updated: '{{date(new Date(2014, 0, 1), new Date(), "YYYY-MM-ddThh:mm:ss Z")}}',
+    tasks: [
+      '{{repeat(1, 15)}}',
+      {
+        _id: '{{objectId()}}',
+        name: '{{lorem(3, "words")}}',
+        completed: '{{bool()}}',
+        created: '{{date(new Date(2014, 0, 1), new Date(), "YYYY-MM-ddThh:mm:ss Z")}}',
+        updated: '{{date(new Date(2014, 0, 1), new Date(), "YYYY-MM-ddThh:mm:ss Z")}}'
+      }
+    ]
+  }
+]

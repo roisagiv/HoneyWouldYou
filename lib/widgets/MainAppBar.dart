@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:honeywouldyou/widgets/BottomAppBar.dart';
 
+/// MainAppBar
 class MainAppBar extends AppBar {
-  MainAppBar(TextStyle titleTextStyle)
+  ///
+  MainAppBar(final TextStyle titleTextStyle)
       : super(
           title: new Text(
-            "Today",
+            'Today',
             style: titleTextStyle,
           ),
           bottom: new BottomAppBar(),
