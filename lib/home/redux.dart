@@ -1,22 +1,25 @@
 import 'dart:async';
 
 import 'package:honeywouldyou/data/list_repository.dart';
-import 'package:honeywouldyou/home/models.dart';
+import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/redux/redux.dart';
+import 'package:meta/meta.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
 
 ///
-class RootReducer extends ReducerClass<AppState> {
+class HomeReducer extends ReducerClass<AppState> {
   ///
   @override
-  AppState call(AppState state, Action action) {
+  AppState call(AppState state, @checked Action action) {
     if (action is OnDataRefreshAction) {
-      return new AppState(action.payload);
+      return new AppState((b) => b..lists.replace(action.payload));
     }
     if (action is OnAddNewListSaveClickedAction) {
-      final lists = state.lists..add(new ListModel('', action.payload, []));
-      return new AppState(lists);
+      return state.rebuild((b) => b
+        ..lists.add(new ListModel((b) => b
+          ..name = action.payload
+          ..id = '')));
     }
     return state;
   }
@@ -31,7 +34,8 @@ class HomeEpic extends EpicClass<AppState> {
 
   ///
   @override
-  Stream<Action> call(Stream<Action> actions, EpicStore<AppState> store) =>
+  Stream<dynamic> call(
+          @checked Stream<dynamic> actions, EpicStore<AppState> store) =>
       actions.where((action) => action is OnHomePageConnectedAction).asyncMap(
           (action) => _listRepository
               .listsAsFuture()

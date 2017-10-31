@@ -1,11 +1,15 @@
 import 'dart:async';
+
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:honeywouldyou/home/models.dart';
+import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/home/redux.dart';
+import 'package:honeywouldyou/navigation.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/theme.dart';
-import 'package:honeywouldyou/widgets/MainAppBar.dart';
+import 'package:honeywouldyou/widgets/main_app_bar.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
 ///
@@ -23,22 +27,33 @@ class _ViewModel {
 
 ///
 class HomePage extends StatelessWidget {
+  final Navigation _navigation;
+
   ///
-  const HomePage();
+  const HomePage(this._navigation);
 
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, _ViewModel>(
         converter: (store) => new _ViewModel(
-            store.state.lists,
+            store.state.lists.toList(),
             (name) => store.dispatch(new OnAddNewListSaveClickedAction(name)),
             () => store.dispatch(new OnHomePageConnectedAction())),
         builder: (context, viewModel) => new Scaffold(
-              appBar: new MainAppBar(Theme.of(context).textTheme.display1),
+              appBar: new MainAppBar(
+                title: new Text(
+                  'Today',
+                  style: AppTextStyles.appBarTitle(context),
+                ),
+                subtitle: new Text(
+                  new DateFormat("EEE, MMM d, ''yy").format(new DateTime.now()),
+                  style: AppTextStyles.appBarSubtitle(context),
+                ),
+              ),
               body: new Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.screenEdgeMargin),
-                child: new ListsContainer(viewModel),
+                child: new ListsContainer(viewModel, _navigation),
               ),
               bottomNavigationBar: new Container(
                 height: AppDimens.bottomNavigationBarHeight,
@@ -84,18 +99,20 @@ class HomePage extends StatelessWidget {
 ///
 class ListsContainer extends StatefulWidget {
   final _ViewModel _viewModel;
+  final Navigation _navigation;
 
   ///
-  const ListsContainer(this._viewModel);
+  const ListsContainer(this._viewModel, this._navigation);
 
   @override
-  State createState() => new _ListsContainerState(_viewModel);
+  State createState() => new _ListsContainerState(_viewModel, _navigation);
 }
 
 class _ListsContainerState extends State<ListsContainer> {
   final _ViewModel _viewModel;
+  final Navigation _navigation;
 
-  _ListsContainerState(this._viewModel);
+  _ListsContainerState(this._viewModel, this._navigation);
 
   @override
   void initState() {
@@ -106,8 +123,8 @@ class _ListsContainerState extends State<ListsContainer> {
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, List<ListModel>>(
-          converter: (store) => store.state.lists,
-          builder: (context, lists) => new ListsWidget(lists));
+          converter: (store) => store.state.lists.toList(),
+          builder: (context, lists) => new ListsWidget(lists, _navigation));
 }
 
 ///
@@ -115,15 +132,18 @@ class ListsWidget extends StatelessWidget {
   ///
   final List<ListModel> lists;
 
+  final Navigation _navigation;
+
   ///
-  const ListsWidget(this.lists);
+  const ListsWidget(this.lists, this._navigation);
 
   @override
   Widget build(BuildContext context) => new ListView.builder(
         padding: const EdgeInsets.symmetric(
             vertical: AppDimens.listViewPadding + AppDimens.screenEdgeMargin,
             horizontal: AppDimens.listViewPadding),
-        itemBuilder: (context, index) => new ListItemWidget(lists[index]),
+        itemBuilder: (context, index) =>
+            new ListItemWidget(lists[index], _navigation),
         itemCount: lists.length,
       );
 }
@@ -132,9 +152,10 @@ class ListsWidget extends StatelessWidget {
 class ListItemWidget extends StatelessWidget {
   ///
   final ListModel _list;
+  final Navigation _navigation;
 
   ///
-  const ListItemWidget(this._list);
+  const ListItemWidget(this._list, this._navigation);
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +167,9 @@ class ListItemWidget extends StatelessWidget {
           child: new Container(
               height: size,
               child: new InkWell(
-                onTap: () => {},
+                onTap: () => _navigation.navigateTo(
+                    context, '/lists/${_list.id}',
+                    transition: TransitionType.native),
                 child: new Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
@@ -169,7 +192,7 @@ class ListItemWidget extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               new Text(
-                                _list.title,
+                                _list.name,
                                 style: Theme.of(context).textTheme.body1,
                               ),
                               new Text(

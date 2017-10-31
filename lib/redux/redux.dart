@@ -1,41 +1,47 @@
+library redux;
+
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
 import 'package:honeywouldyou/data/list_repository.dart';
-import 'package:honeywouldyou/home/models.dart';
+import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/home/redux.dart';
+import 'package:honeywouldyou/tasks/redux.dart';
 import 'package:logging/logging.dart';
-import 'package:meta/meta.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:redux_logging/redux_logging.dart';
 
-///
-Store<AppState> createStore(ListRepository listRepository) =>
-    new Store<AppState>(new RootReducer(),
-        initialState: new AppState([]),
-        middleware: [
-          new EpicMiddleware(new HomeEpic(listRepository)),
-          new LoggingMiddleware.printer(
-              level: Level.INFO,
-              formatter: LoggingMiddleware.multiLineFormatter),
-        ]);
+part 'redux.g.dart';
 
 ///
-@immutable
-class AppState {
+Store<AppState> createStore(ListRepository listRepository,
+    {bool logging = false}) {
+  final middlewares = [
+    new EpicMiddleware(new HomeEpic(listRepository)),
+    new LoggingMiddleware(
+        formatter: LoggingMiddleware.multiLineFormatter, level: Level.INFO)
+  ];
+
+  if (logging == false) {
+    middlewares.removeLast();
+  }
+
+  return new Store<AppState>(
+      combineReducers([new HomeReducer(), new TasksReducer()]),
+      initialState: new AppStateBuilder().build(),
+      middleware: middlewares);
+}
+
+///
+abstract class AppState implements Built<AppState, AppStateBuilder> {
   ///
-  final List<ListModel> lists;
+  factory AppState([updates(AppStateBuilder b)]) = _$AppState;
 
   ///
-  const AppState(this.lists);
+  AppState._();
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AppState &&
-          runtimeType == other.runtimeType &&
-          lists == other.lists;
-
-  @override
-  int get hashCode => lists.hashCode;
+  ///
+  BuiltList<ListModel> get lists;
 }
 
 ///

@@ -1,4 +1,5 @@
 import 'package:honeywouldyou/data/list_repository.dart';
+import 'package:honeywouldyou/navigation.dart';
 
 ///
 class Injector {
@@ -11,4 +12,7 @@ class Injector {
 
   ///
   ListRepository get listRepository => new ListRepository();
+
+  ///
+  Navigation get navigation => new Navigation();
 }

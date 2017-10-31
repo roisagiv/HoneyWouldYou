@@ -4,11 +4,14 @@ description: A new Flutter project.
 dependencies:
   flutter:
     sdk: flutter
-  redux: "2.0.1"
-  rxdart:
-  flutter_redux: "0.3.1"
-  redux_logging: "0.1.2"
-  redux_epics: "0.6.0" 
+  redux: 2.0.1
+  rxdart: 0.14.0+2
+  flutter_redux: 0.3.1
+  redux_logging: 0.1.2
+  redux_epics: 0.6.0
+  fluro: 1.2.1
+
+  built_value: 4.3.2
 
 
 dev_dependencies:
@@ -16,6 +19,9 @@ dev_dependencies:
     sdk: flutter
   flutter_driver:
     sdk: flutter
+  
+  build_runner: 0.5.0
+  built_value_generator: 4.3.2
 
 
 # For information on the generic Dart part of this file, see the
@@ -33,6 +39,59 @@ flutter:
   assets:
    - assets/mock/lists.json
   #  - images/a_dot_ham.jpeg
+
+  fonts:
+  - family: Poppins
+    fonts:
+      - asset: assets/fonts/Poppins-Medium.ttf
+        weight: 500
+      - asset: assets/fonts/Poppins-Regular.ttf
+        weight: 400
+      - asset: assets/fonts/Poppins-SemiBold.ttf
+        weight: 600
+      - asset: assets/fonts/Poppins-Light.ttf
+        weight: 300
+      - asset: assets/fonts/Poppins-Thin.ttf
+        weight: 200
+
+  - family: Montserrat
+    fonts:
+      - asset: assets/fonts/Montserrat-Bold.ttf
+        weight: 700
+      - asset: assets/fonts/Montserrat-SemiBold.ttf
+        weight: 600
+      - asset: assets/fonts/Montserrat-Regular.ttf
+        weight: 400
+      - asset: assets/fonts/Montserrat-Light.ttf
+        weight: 300
+      - asset: assets/fonts/Montserrat-Thin.ttf
+        weight: 100
+
+  - family: Nunito
+    fonts:
+      - asset: assets/fonts/Nunito-Bold.ttf
+        weight: 700
+      - asset: assets/fonts/Nunito-Regular.ttf
+        weight: 400
+      - asset: assets/fonts/Nunito-SemiBold.ttf
+        weight: 600
+      - asset: assets/fonts/Nunito-Light.ttf
+        weight: 300
+      - asset: assets/fonts/Nunito-ExtraLight.ttf
+        weight: 200
+
+  - family: NotoSans
+    fonts:
+      - asset: assets/fonts/NotoSans-Bold.ttf
+        weight: 700
+      - asset: assets/fonts/NotoSans-Regular.ttf
+        weight: 400
+
+  - family: VarelaRound
+    fonts:
+      - asset: assets/fonts/VarelaRound-Regular.ttf
+        weight: 400
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

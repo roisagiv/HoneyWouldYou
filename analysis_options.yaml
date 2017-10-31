@@ -1,5 +1,10 @@
 analyzer:
-  strong-mode
+
+  strong-mode: true
+
+  exclude:
+    - '**/models.g.dart'
+    - '**/redux.g.dart'
 
 linter:
   rules:
