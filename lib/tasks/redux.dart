@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:meta/meta.dart';
@@ -7,7 +8,7 @@ import 'package:redux/redux.dart';
 class TasksReducer extends ReducerClass<AppState> {
   ///
   @override
-  AppState call(AppState state, @checked Action action) {
+  AppState call(AppState state, @checked Action<dynamic, dynamic> action) {
     switch (action.runtimeType) {
       case OnTaskCompleteToggledAction:
         return _onTaskCompleteToggled(state, action);
@@ -19,44 +20,49 @@ class TasksReducer extends ReducerClass<AppState> {
 
   AppState _onTaskCompleteToggled(
       AppState state, OnTaskCompleteToggledAction action) {
-    var updatedList =
-        state.lists.singleWhere((l) => l.id == action.payload.listId);
-    final updatedListIndex = state.lists.indexOf(updatedList);
+    ListModel updatedList =
+        state.lists.singleWhere((ListModel l) => l.id == action.payload.listId);
+    final int updatedListIndex = state.lists.indexOf(updatedList);
 
-    var updatedTask =
-        updatedList.tasks.singleWhere((t) => t.id == action.payload.taskId);
-    final updatedTaskIndex = updatedList.tasks.indexOf(updatedTask);
+    TaskModel updatedTask = updatedList.tasks
+        .singleWhere((TaskModel t) => t.id == action.payload.taskId);
+    final int updatedTaskIndex = updatedList.tasks.indexOf(updatedTask);
 
-    updatedTask =
-        updatedTask.rebuild((b) => b.completed = action.payload.completed);
+    updatedTask = updatedTask.rebuild(
+        (TaskModelBuilder b) => b.completed = action.payload.completed);
 
-    updatedList = updatedList.rebuild((b) => b.tasks = updatedList.tasks
-        .rebuild((b) => b.replaceRange(
-            updatedTaskIndex, updatedTaskIndex + 1, [updatedTask]))
-        .toBuilder());
+    updatedList = updatedList.rebuild((ListModelBuilder b) => b.tasks =
+        updatedList.tasks
+            .rebuild((ListBuilder<TaskModel> b) => b.replaceRange(
+                updatedTaskIndex,
+                updatedTaskIndex + 1,
+                <TaskModel>[updatedTask]))
+            .toBuilder());
 
-    return state.rebuild((b) => b
+    return state.rebuild((AppStateBuilder b) => b
       ..lists = state.lists
-          .rebuild((b) => b.replaceRange(
-              updatedListIndex, updatedListIndex + 1, [updatedList]))
+          .rebuild((ListBuilder<ListModel> b) => b.replaceRange(
+              updatedListIndex, updatedListIndex + 1, <ListModel>[updatedList]))
           .toBuilder());
   }
 
   AppState _onAddTask(AppState state, OnAddTaskAction action) {
-    var updatedList =
-        state.lists.singleWhere((l) => l.id == action.payload.listId);
-    final updatedListIndex = state.lists.indexOf(updatedList);
+    ListModel updatedList =
+        state.lists.singleWhere((ListModel l) => l.id == action.payload.listId);
+    final int updatedListIndex = state.lists.indexOf(updatedList);
 
-    updatedList = updatedList.rebuild((b) => b.tasks.add(new TaskModel((b) {
-          b.id = '123';
-          b.completed = false;
-          return b.name = action.payload.name;
-        })));
+    updatedList = updatedList.rebuild(
+        (ListModelBuilder b) => b.tasks.add(new TaskModel((TaskModelBuilder b) {
+              b
+                ..id = '123'
+                ..completed = false;
+              return b.name = action.payload.name;
+            })));
 
-    return state.rebuild((b) => b
+    return state.rebuild((AppStateBuilder b) => b
       ..lists = state.lists
-          .rebuild((b) => b.replaceRange(
-              updatedListIndex, updatedListIndex + 1, [updatedList]))
+          .rebuild((ListBuilder<ListModel> b) => b.replaceRange(
+              updatedListIndex, updatedListIndex + 1, <ListModel>[updatedList]))
           .toBuilder());
   }
 }
@@ -80,8 +86,8 @@ class OnTaskCompleteToggledData {
 class OnTaskCompleteToggledAction
     extends Action<OnTaskCompleteToggledData, Null> {
   ///
-  OnTaskCompleteToggledAction(payload)
-      : super(type: 'OnTaskCompleteToggledAction', payload: payload);
+  OnTaskCompleteToggledAction(OnTaskCompleteToggledData payload)
+      : super(payload: payload);
 }
 
 ///
@@ -99,5 +105,5 @@ class OnAddTaskActionData {
 ///
 class OnAddTaskAction extends Action<OnAddTaskActionData, Null> {
   ///
-  OnAddTaskAction(payload) : super(type: 'OnAddTaskAction', payload: payload);
+  OnAddTaskAction(OnAddTaskActionData payload) : super(payload: payload);
 }

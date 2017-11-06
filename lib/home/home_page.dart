@@ -4,13 +4,13 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:honeywouldyou/data/models.dart';
-import 'package:honeywouldyou/home/redux.dart';
 import 'package:honeywouldyou/navigation.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/theme.dart';
 import 'package:honeywouldyou/widgets/main_app_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:redux/redux.dart';
 
 ///
 typedef void NewListItem(String name);
@@ -20,9 +20,10 @@ class _ViewModel {
   final List<ListModel> lists;
   final NewListItem newListItemFunction;
   final VoidCallback onAttachedFunction;
+  final VoidCallback onLogoutButtonClicked;
 
-  const _ViewModel(
-      this.lists, this.newListItemFunction, this.onAttachedFunction);
+  const _ViewModel(this.lists, this.newListItemFunction,
+      this.onAttachedFunction, this.onLogoutButtonClicked);
 }
 
 ///
@@ -35,21 +36,14 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, _ViewModel>(
-        converter: (store) => new _ViewModel(
+        converter: (Store<AppState> store) => new _ViewModel(
             store.state.lists.toList(),
-            (name) => store.dispatch(new OnAddNewListSaveClickedAction(name)),
-            () => store.dispatch(new OnHomePageConnectedAction())),
-        builder: (context, viewModel) => new Scaffold(
-              appBar: new MainAppBar(
-                title: new Text(
-                  'Today',
-                  style: AppTextStyles.appBarTitle(context),
-                ),
-                subtitle: new Text(
-                  new DateFormat("EEE, MMM d, ''yy").format(new DateTime.now()),
-                  style: AppTextStyles.appBarSubtitle(context),
-                ),
-              ),
+            (String name) =>
+                store.dispatch(new OnAddNewListSaveClickedAction(name)),
+            () => store.dispatch(new OnHomePageConnectedAction()),
+            () => store.dispatch(new OnSignOutButtonClickedAction())),
+        builder: (BuildContext context, _ViewModel viewModel) => new Scaffold(
+              appBar: _buildAppBar(context, viewModel),
               body: new Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.screenEdgeMargin),
@@ -73,8 +67,39 @@ class HomePage extends StatelessWidget {
             ),
       );
 
-  Future _addNewList(BuildContext context, _ViewModel viewModel) {
-    final fieldController = new TextEditingController();
+  ///
+  MainAppBar _buildAppBar(BuildContext context, _ViewModel viewModel) =>
+      new MainAppBar(
+        title: new Text(
+          'Today',
+          style: AppTextStyles.appBarTitle(context),
+        ),
+        subtitle: new Text(
+          new DateFormat("EEE, MMM d, ''yy").format(new DateTime.now()),
+          style: AppTextStyles.appBarSubtitle(context),
+        ),
+        actions: <Widget>[
+          new PopupMenuButton<String>(
+              icon: new Icon(
+                Icons.more_vert,
+                color: AppColors.black,
+              ),
+              onSelected: (String value) => viewModel.onLogoutButtonClicked(),
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                    new PopupMenuItem<String>(
+                      child: new ListTile(
+                        dense: true,
+                        leading: new Icon(Icons.person_outline),
+                        title: new Text('Logout'),
+                      ),
+                      value: 'Logout',
+                    )
+                  ]),
+        ],
+      );
+
+  Future<dynamic> _addNewList(BuildContext context, _ViewModel viewModel) {
+    final TextEditingController fieldController = new TextEditingController();
     return showDialog(
       context: context,
       child: new AlertDialog(
@@ -112,7 +137,8 @@ class _ListsContainerState extends State<ListsContainer> {
   final _ViewModel _viewModel;
   final Navigation _navigation;
 
-  _ListsContainerState(this._viewModel, this._navigation);
+  _ListsContainerState(_ViewModel _viewModel, this._navigation)
+      : _viewModel = _viewModel;
 
   @override
   void initState() {
@@ -123,8 +149,9 @@ class _ListsContainerState extends State<ListsContainer> {
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, List<ListModel>>(
-          converter: (store) => store.state.lists.toList(),
-          builder: (context, lists) => new ListsWidget(lists, _navigation));
+          converter: (Store<AppState> store) => store.state.lists.toList(),
+          builder: (BuildContext context, List<ListModel> lists) =>
+              new ListsWidget(lists, _navigation));
 }
 
 ///
@@ -142,7 +169,7 @@ class ListsWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             vertical: AppDimens.listViewPadding + AppDimens.screenEdgeMargin,
             horizontal: AppDimens.listViewPadding),
-        itemBuilder: (context, index) =>
+        itemBuilder: (BuildContext context, int index) =>
             new ListItemWidget(lists[index], _navigation),
         itemCount: lists.length,
       );
@@ -159,7 +186,7 @@ class ListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const size = AppDimens.listItemHeight;
+    const double size = AppDimens.listItemHeight;
     return new Container(
       padding: const EdgeInsets.all(4.0),
       child: new Card(
@@ -205,7 +232,7 @@ class ListItemWidget extends StatelessWidget {
                     new IconButton(
                       alignment: Alignment.centerRight,
                       icon: new Icon(Icons.more_vert),
-                      onPressed: () => {},
+                      onPressed: () => Null,
                       color: AppColors.manatee,
                     )
                   ],

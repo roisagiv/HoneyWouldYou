@@ -7,5 +7,5 @@ import 'package:honeywouldyou/data/models.dart';
 part 'serializers.g.dart';
 
 ///
-@SerializersFor(const [ListModel, TaskModel])
+@SerializersFor(const <Type>[ListModel, TaskModel])
 final Serializers serializers = _$serializers;

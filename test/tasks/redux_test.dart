@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:honeywouldyou/home/redux.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/tasks/redux.dart';
+import 'package:redux/redux.dart';
 import 'package:test/test.dart';
 
 import '../data/testable_list_repository.dart';
@@ -11,12 +12,12 @@ import '../data/testable_list_repository.dart';
 void main() {
   ///
   group('tasks', () {
-    var store;
+    Store<AppState> store;
     setUp(() async {
-      store = createStore(new TestableListRepository())
+      store = createStore(listRepository: new TestableListRepository())
         ..dispatch(new OnHomePageConnectedAction());
 
-      await new Future.delayed(new Duration(milliseconds: 10));
+      await new Future<Null>.delayed(new Duration(milliseconds: 100));
     });
 
     ///

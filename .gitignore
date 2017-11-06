@@ -147,6 +147,7 @@ fabric.properties
 
 ## Build generated
 DerivedData/
+Index/
 
 ## Various settings
 *.pbxuser
@@ -180,3 +181,6 @@ xcuserdata/
 ios/.generated/
 packages
 .flutter-plugins
+
+# Firebase configuration
+GoogleService-Info.plist

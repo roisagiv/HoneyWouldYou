@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/redux/redux.dart';
-import 'package:honeywouldyou/tasks/redux.dart';
 import 'package:honeywouldyou/theme.dart';
 import 'package:honeywouldyou/widgets/main_app_bar.dart';
 import 'package:meta/meta.dart';
+import 'package:redux/redux.dart';
 
 typedef void _OnTaskCompletedToggled(String taskId, bool completed);
 typedef void _OnTaskAdded(String name);
@@ -23,14 +23,16 @@ class TasksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, _ViewModel>(
-          converter: (store) => new _ViewModel(
-              list: store.state.lists.firstWhere((list) => list.id == _listId),
-              onCompleteCheckBoxClicked: (taskId, value) => store.dispatch(
-                  new OnTaskCompleteToggledAction(new OnTaskCompleteToggledData(
-                      listId: _listId, taskId: taskId, completed: value))),
-              onTaskAdded: (name) => store.dispatch(new OnAddTaskAction(
+          converter: (Store<AppState> store) => new _ViewModel(
+              list: store.state.lists
+                  .firstWhere((ListModel list) => list.id == _listId),
+              onCompleteCheckBoxClicked: (String taskId, bool value) =>
+                  store.dispatch(new OnTaskCompleteToggledAction(
+                      new OnTaskCompleteToggledData(
+                          listId: _listId, taskId: taskId, completed: value))),
+              onTaskAdded: (String name) => store.dispatch(new OnAddTaskAction(
                   new OnAddTaskActionData(listId: _listId, name: name)))),
-          builder: (context, viewModel) => new Scaffold(
+          builder: (BuildContext context, _ViewModel viewModel) => new Scaffold(
                 appBar: new MainAppBar(
                   title: new Text(
                     viewModel.list.name,
@@ -55,8 +57,8 @@ class TasksPage extends StatelessWidget {
                 ),
               ));
 
-  Future _addNewTaskDialog(BuildContext context, _ViewModel viewModel) {
-    final fieldController = new TextEditingController();
+  Future<Null> _addNewTaskDialog(BuildContext context, _ViewModel viewModel) {
+    final TextEditingController fieldController = new TextEditingController();
     return showDialog(
         context: context,
         child: new AlertDialog(
@@ -90,8 +92,9 @@ class TasksListWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(
             vertical: AppDimens.listViewPadding + AppDimens.screenEdgeMargin,
             horizontal: AppDimens.listViewPadding),
-        itemBuilder: (context, index) => new TaskListItemWidget(
-            _viewModel.list.tasks[index], _viewModel.onCompleteCheckBoxClicked),
+        itemBuilder: (BuildContext context, int index) =>
+            new TaskListItemWidget(_viewModel.list.tasks[index],
+                _viewModel.onCompleteCheckBoxClicked),
         itemCount: _viewModel.list.tasks.length,
       );
 }
@@ -115,7 +118,7 @@ class TaskListItemWidget extends StatelessWidget {
               new Container(
                 child: new Checkbox(
                   value: _task.completed,
-                  onChanged: (value) => _callback(_task.id, value),
+                  onChanged: (bool value) => _callback(_task.id, value),
                 ),
               ),
               new Text(

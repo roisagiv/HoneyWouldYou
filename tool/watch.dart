@@ -14,13 +14,11 @@ import 'package:source_gen/source_gen.dart';
 ///
 /// Import the generators you want and pass them to [watch] as shown,
 /// specifying which files in which packages you want to run against.
-Future main(List<String> args) async {
-  await watch([
-    new BuildAction(
-        new PartBuilder([
-          new BuiltValueGenerator(),
-        ]),
-        'honeywouldyou',
-        inputs: const ['lib/*.dart'])
-  ], deleteFilesByDefault: true);
-}
+Future<ServeHandler> main(List<String> args) async => await watch(<BuildAction>[
+      new BuildAction(
+          new PartBuilder(<Generator>[
+            new BuiltValueGenerator(),
+          ]),
+          'honeywouldyou',
+          inputs: const <String>['lib/*.dart'])
+    ], deleteFilesByDefault: true);

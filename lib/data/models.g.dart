@@ -14,6 +14,42 @@ part of models;
 // ignore_for_file: prefer_expression_function_bodies
 // ignore_for_file: sort_constructors_first
 
+const AuthenticationStatus _$authenticated =
+    const AuthenticationStatus._('authenticated');
+const AuthenticationStatus _$notAuthenticated =
+    const AuthenticationStatus._('notAuthenticated');
+const AuthenticationStatus _$error = const AuthenticationStatus._('error');
+const AuthenticationStatus _$inProgress =
+    const AuthenticationStatus._('inProgress');
+const AuthenticationStatus _$notDetemined =
+    const AuthenticationStatus._('notDetemined');
+
+AuthenticationStatus _$valueOf(String name) {
+  switch (name) {
+    case 'authenticated':
+      return _$authenticated;
+    case 'notAuthenticated':
+      return _$notAuthenticated;
+    case 'error':
+      return _$error;
+    case 'inProgress':
+      return _$inProgress;
+    case 'notDetemined':
+      return _$notDetemined;
+    default:
+      throw new ArgumentError(name);
+  }
+}
+
+final BuiltSet<AuthenticationStatus> _$values =
+    new BuiltSet<AuthenticationStatus>(const <AuthenticationStatus>[
+  _$authenticated,
+  _$notAuthenticated,
+  _$error,
+  _$inProgress,
+  _$notDetemined,
+]);
+
 Serializer<TaskModel> _$taskModelSerializer = new _$TaskModelSerializer();
 Serializer<ListModel> _$listModelSerializer = new _$ListModelSerializer();
 
@@ -307,6 +343,100 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
   _$ListModel build() {
     final _$result =
         _$v ?? new _$ListModel._(id: id, name: name, tasks: tasks?.build());
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$UserModel extends UserModel {
+  @override
+  final String uid;
+  @override
+  final String email;
+  @override
+  final String displayName;
+
+  factory _$UserModel([void updates(UserModelBuilder b)]) =>
+      (new UserModelBuilder()..update(updates)).build();
+
+  _$UserModel._({this.uid, this.email, this.displayName}) : super._() {
+    if (email == null) throw new ArgumentError.notNull('email');
+  }
+
+  @override
+  UserModel rebuild(void updates(UserModelBuilder b)) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  UserModelBuilder toBuilder() => new UserModelBuilder()..replace(this);
+
+  @override
+  bool operator ==(dynamic other) {
+    if (identical(other, this)) return true;
+    if (other is! UserModel) return false;
+    return uid == other.uid &&
+        email == other.email &&
+        displayName == other.displayName;
+  }
+
+  @override
+  int get hashCode {
+    return $jf(
+        $jc($jc($jc(0, uid.hashCode), email.hashCode), displayName.hashCode));
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper('UserModel')
+          ..add('uid', uid)
+          ..add('email', email)
+          ..add('displayName', displayName))
+        .toString();
+  }
+}
+
+class UserModelBuilder implements Builder<UserModel, UserModelBuilder> {
+  _$UserModel _$v;
+
+  String _uid;
+  String get uid => _$this._uid;
+  set uid(String uid) => _$this._uid = uid;
+
+  String _email;
+  String get email => _$this._email;
+  set email(String email) => _$this._email = email;
+
+  String _displayName;
+  String get displayName => _$this._displayName;
+  set displayName(String displayName) => _$this._displayName = displayName;
+
+  UserModelBuilder();
+
+  UserModelBuilder get _$this {
+    if (_$v != null) {
+      _uid = _$v.uid;
+      _email = _$v.email;
+      _displayName = _$v.displayName;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(UserModel other) {
+    if (other == null) throw new ArgumentError.notNull('other');
+    _$v = other as _$UserModel;
+  }
+
+  @override
+  void update(void updates(UserModelBuilder b)) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  _$UserModel build() {
+    final _$result = _$v ??
+        new _$UserModel._(uid: uid, email: email, displayName: displayName);
     replace(_$result);
     return _$result;
   }

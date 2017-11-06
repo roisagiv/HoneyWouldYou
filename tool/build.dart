@@ -12,17 +12,15 @@ import 'package:source_gen/source_gen.dart';
 ///
 /// Import the generators you want and pass them to [build] as shown,
 /// specifying which files in which packages you want to run against.
-Future main(List<String> args) async {
-  await build([
-    new BuildAction(
-        new PartBuilder([
-          new BuiltValueGenerator(),
-        ]),
-        'honeywouldyou',
-        inputs: const [
-          'lib/data/models.dart',
-          'lib/data/serializers.dart',
-          'lib/redux/redux.dart'
-        ])
-  ], deleteFilesByDefault: true);
-}
+Future<BuildResult> main(List<String> args) async => await build(<BuildAction>[
+      new BuildAction(
+          new PartBuilder(<Generator>[
+            new BuiltValueGenerator(),
+          ]),
+          'honeywouldyou',
+          inputs: const <String>[
+            'lib/data/models.dart',
+            'lib/data/serializers.dart',
+            'lib/redux/redux.dart'
+          ])
+    ], deleteFilesByDefault: true);

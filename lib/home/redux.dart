@@ -11,13 +11,14 @@ import 'package:redux_epics/redux_epics.dart';
 class HomeReducer extends ReducerClass<AppState> {
   ///
   @override
-  AppState call(AppState state, @checked Action action) {
+  AppState call(AppState state, @checked Action<dynamic, dynamic> action) {
     if (action is OnDataRefreshAction) {
-      return new AppState((b) => b..lists.replace(action.payload));
+      return state
+          .rebuild((AppStateBuilder b) => b..lists.replace(action.payload));
     }
     if (action is OnAddNewListSaveClickedAction) {
-      return state.rebuild((b) => b
-        ..lists.add(new ListModel((b) => b
+      return state.rebuild((AppStateBuilder b) => b
+        ..lists.add(new ListModel((ListModelBuilder b) => b
           ..name = action.payload
           ..id = '')));
     }
@@ -36,28 +37,26 @@ class HomeEpic extends EpicClass<AppState> {
   @override
   Stream<dynamic> call(
           @checked Stream<dynamic> actions, EpicStore<AppState> store) =>
-      actions.where((action) => action is OnHomePageConnectedAction).asyncMap(
-          (action) => _listRepository
+      actions
+          .where((Action<dynamic, dynamic> action) =>
+              action is OnHomePageConnectedAction)
+          .asyncMap((Action<dynamic, dynamic> action) => _listRepository
               .listsAsFuture()
-              .then((lists) => new OnDataRefreshAction(lists)));
+              .then((Iterable<ListModel> lists) =>
+                  new OnDataRefreshAction(lists)));
 }
 
 ///
-class OnHomePageConnectedAction extends Action<Null, Null> {
-  ///
-  OnHomePageConnectedAction() : super(type: 'OnHomePageConnectedAction');
-}
+class OnHomePageConnectedAction extends Action<Null, Null> {}
 
 ///
 class OnDataRefreshAction extends Action<List<ListModel>, Null> {
   ///
-  OnDataRefreshAction(payload)
-      : super(type: 'OnDataRefreshAction', payload: payload);
+  OnDataRefreshAction(List<ListModel> payload) : super(payload: payload);
 }
 
 ///
 class OnAddNewListSaveClickedAction extends Action<String, Null> {
   ///
-  OnAddNewListSaveClickedAction(payload)
-      : super(type: 'OnAddNewListSaveClickedAction', payload: payload);
+  OnAddNewListSaveClickedAction(String payload) : super(payload: payload);
 }

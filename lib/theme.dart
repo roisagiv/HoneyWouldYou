@@ -55,7 +55,7 @@ class AppThemes {
 
   ///
   static ThemeData main(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return new ThemeData.light().copyWith(
         primaryColor: Colors.white,
         // primaryTextTheme: new Typography(platform: theme.platform).black,
@@ -107,6 +107,18 @@ class AppTextStyles {
   ///
   static TextStyle appBarSubtitle(BuildContext context) =>
       Theme.of(context).textTheme.subhead;
+
+  ///
+  static TextStyle textErrorMessage(BuildContext context) =>
+      Theme.of(context).textTheme.caption.copyWith(color: AppColors.radicalRed);
+
+  ///
+  static TextStyle buttonText(BuildContext context) =>
+      Theme.of(context).textTheme.button.copyWith(color: AppColors.snow);
+
+  ///
+  static TextStyle buttonTextDark(BuildContext context) =>
+      Theme.of(context).textTheme.button.copyWith(color: AppColors.black);
 }
 
 ///
