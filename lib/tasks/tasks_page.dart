@@ -23,15 +23,18 @@ class TasksPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, _ViewModel>(
+          onInit: (Store<dynamic> store) =>
+              store.dispatch(new OnTasksPageConnectedAction(listId: _listId)),
           converter: (Store<AppState> store) => new _ViewModel(
-              list: store.state.lists
-                  .firstWhere((ListModel list) => list.id == _listId),
+              tasks: new List<TaskModel>.from(store.state.tasks.values
+                  .where((TaskModel task) => task.listId == _listId)),
+              list: store.state.lists[_listId],
               onCompleteCheckBoxClicked: (String taskId, bool value) =>
                   store.dispatch(new OnTaskCompleteToggledAction(
                       new OnTaskCompleteToggledData(
                           listId: _listId, taskId: taskId, completed: value))),
-              onTaskAdded: (String name) => store.dispatch(new OnAddTaskAction(
-                  new OnAddTaskActionData(listId: _listId, name: name)))),
+              onTaskAdded: (String name) =>
+                  store.dispatch(new OnAddTaskAction(new OnAddTaskActionData(listId: _listId, name: name)))),
           builder: (BuildContext context, _ViewModel viewModel) => new Scaffold(
                 appBar: new MainAppBar(
                   title: new Text(
@@ -42,7 +45,7 @@ class TasksPage extends StatelessWidget {
                     color: AppColors.manatee,
                   ),
                   subtitle: new Text(
-                    '${viewModel.list.tasks.length} Tasks',
+                    '${viewModel.list.tasksCount} Tasks',
                     style: AppTextStyles.appBarSubtitle(context),
                   ),
                 ),
@@ -93,9 +96,9 @@ class TasksListWidget extends StatelessWidget {
             vertical: AppDimens.listViewPadding + AppDimens.screenEdgeMargin,
             horizontal: AppDimens.listViewPadding),
         itemBuilder: (BuildContext context, int index) =>
-            new TaskListItemWidget(_viewModel.list.tasks[index],
-                _viewModel.onCompleteCheckBoxClicked),
-        itemCount: _viewModel.list.tasks.length,
+            new TaskListItemWidget(
+                _viewModel.tasks[index], _viewModel.onCompleteCheckBoxClicked),
+        itemCount: _viewModel.tasks.length,
       );
 }
 
@@ -135,10 +138,14 @@ class TaskListItemWidget extends StatelessWidget {
 @immutable
 class _ViewModel {
   final ListModel list;
+  final List<TaskModel> tasks;
   final _OnTaskCompletedToggled onCompleteCheckBoxClicked;
   final _OnTaskAdded onTaskAdded;
 
   ///
   const _ViewModel(
-      {this.list, this.onCompleteCheckBoxClicked, this.onTaskAdded});
+      {this.tasks,
+      this.list,
+      this.onCompleteCheckBoxClicked,
+      this.onTaskAdded});
 }

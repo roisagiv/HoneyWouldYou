@@ -37,7 +37,6 @@ class SplashEpic extends EpicClass<AppState> {
               (Action<dynamic, dynamic> action) => action is OnSplashInitAction)
           .asyncMap((Action<dynamic, dynamic> action) =>
               _authenticator.currentUser().then((AuthenticatedUser user) async {
-                await new Future<Null>.delayed(new Duration(milliseconds: 500));
                 if (user != null) {
                   return new OnUserAuthenticationSucceedAction(user);
                 }

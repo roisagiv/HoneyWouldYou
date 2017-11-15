@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:async/async.dart';
 import 'package:honeywouldyou/auth/authenticator.dart';
 import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/redux/redux.dart';
@@ -40,6 +41,7 @@ class AuthReducer extends ReducerClass<AppState> {
       state.rebuild((AppStateBuilder b) => b
         ..authentication.currentUser = new UserModel((UserModelBuilder b) => b
           ..email = action.payload.email
+          ..uid = action.payload.id
           ..displayName = action.payload.displayName).toBuilder()
         ..authentication.authenticationStatus =
             AuthenticationStatus.authenticated);
@@ -55,6 +57,58 @@ class AuthReducer extends ReducerClass<AppState> {
 /**
  * Epics
  */
+
+///
+class SignUpEpic extends EpicClass<AppState> {
+  final Authenticator _authenticator;
+
+  ///
+  SignUpEpic(this._authenticator);
+
+  @override
+  Stream<dynamic> call(Stream<dynamic> actions, EpicStore<AppState> store) =>
+      actions
+          .where((Action<dynamic, dynamic> action) =>
+              action is OnSignUpButtonClickedAction)
+          .asyncMap((OnSignUpButtonClickedAction action) => _authenticator
+                  .createUserWithEmailAndPassword(
+                      email: action.email, password: action.password)
+                  .then((Result<AuthenticatedUser> result) {
+                if (result.isError) {
+                  return new OnUserAuthenticationFailedAction(
+                      result.asError.error);
+                } else {
+                  return new OnUserAuthenticationSucceedAction(
+                      result.asValue.value);
+                }
+              }));
+}
+
+///
+class SignInEpic extends EpicClass<AppState> {
+  final Authenticator _authenticator;
+
+  ///
+  SignInEpic(this._authenticator);
+
+  @override
+  Stream<dynamic> call(Stream<dynamic> actions, EpicStore<AppState> store) =>
+      actions
+          .where((Action<dynamic, dynamic> action) =>
+              action is OnLoginButtonClickedAction)
+          .asyncMap((OnLoginButtonClickedAction action) => _authenticator
+                  .signInWithEmailAndPassword(
+                      email: action.email, password: action.password)
+                  .then((Result<AuthenticatedUser> result) {
+                if (result.isError) {
+                  return new OnUserAuthenticationFailedAction(
+                      result.asError.error);
+                } else {
+                  return new OnUserAuthenticationSucceedAction(
+                      result.asValue.value);
+                }
+              }));
+}
 
 ///
 class SignOutEpic extends EpicClass<AppState> {
@@ -73,6 +127,15 @@ class SignOutEpic extends EpicClass<AppState> {
               .signOut()
               .whenComplete(() => new OnSignOutCompletedAction()));
 }
+
+///
+Epic<AppState> rootAuthEpic(Authenticator authenticator) =>
+    combineEpics(<Epic<AppState>>[
+      new SignUpEpic(authenticator),
+      new SignInEpic(authenticator),
+      new SignOutEpic(authenticator)
+    ]);
+
 /*
 Actions
 */

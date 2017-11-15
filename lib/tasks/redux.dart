@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/redux/redux.dart';
+import 'package:honeywouldyou/services.dart';
 import 'package:meta/meta.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_epics/redux_epics.dart';
+import 'package:rxdart/rxdart.dart';
 
 ///
 class TasksReducer extends ReducerClass<AppState> {
@@ -14,57 +19,84 @@ class TasksReducer extends ReducerClass<AppState> {
         return _onTaskCompleteToggled(state, action);
       case OnAddTaskAction:
         return _onAddTask(state, action);
+      case OnNewTasksDataAction:
+        return _onNewTasksDataAction(state, action);
     }
     return state.toBuilder().build();
   }
 
   AppState _onTaskCompleteToggled(
       AppState state, OnTaskCompleteToggledAction action) {
-    ListModel updatedList =
-        state.lists.singleWhere((ListModel l) => l.id == action.payload.listId);
-    final int updatedListIndex = state.lists.indexOf(updatedList);
-
-    TaskModel updatedTask = updatedList.tasks
+    TaskModel updatedTask = state.tasks.values
         .singleWhere((TaskModel t) => t.id == action.payload.taskId);
-    final int updatedTaskIndex = updatedList.tasks.indexOf(updatedTask);
 
     updatedTask = updatedTask.rebuild(
         (TaskModelBuilder b) => b.completed = action.payload.completed);
 
-    updatedList = updatedList.rebuild((ListModelBuilder b) => b.tasks =
-        updatedList.tasks
-            .rebuild((ListBuilder<TaskModel> b) => b.replaceRange(
-                updatedTaskIndex,
-                updatedTaskIndex + 1,
-                <TaskModel>[updatedTask]))
-            .toBuilder());
-
     return state.rebuild((AppStateBuilder b) => b
-      ..lists = state.lists
-          .rebuild((ListBuilder<ListModel> b) => b.replaceRange(
-              updatedListIndex, updatedListIndex + 1, <ListModel>[updatedList]))
+      ..tasks = state.tasks
+          .rebuild((MapBuilder<String, TaskModel> b) =>
+              b[updatedTask.id] = updatedTask)
           .toBuilder());
   }
 
   AppState _onAddTask(AppState state, OnAddTaskAction action) {
-    ListModel updatedList =
-        state.lists.singleWhere((ListModel l) => l.id == action.payload.listId);
-    final int updatedListIndex = state.lists.indexOf(updatedList);
-
-    updatedList = updatedList.rebuild(
-        (ListModelBuilder b) => b.tasks.add(new TaskModel((TaskModelBuilder b) {
-              b
-                ..id = '123'
-                ..completed = false;
-              return b.name = action.payload.name;
-            })));
+    final TaskModel taskModel = new TaskModel((TaskModelBuilder b) {
+      b
+        ..id = '123'
+        ..listId = action.payload.listId
+        ..completed = false;
+      return b.name = action.payload.name;
+    });
 
     return state.rebuild((AppStateBuilder b) => b
-      ..lists = state.lists
-          .rebuild((ListBuilder<ListModel> b) => b.replaceRange(
-              updatedListIndex, updatedListIndex + 1, <ListModel>[updatedList]))
+      ..tasks = state.tasks
+          .rebuild((MapBuilder<String, TaskModel> b) =>
+              b.addAll(<String, TaskModel>{taskModel.id: taskModel}))
           .toBuilder());
   }
+
+  AppState _onNewTasksDataAction(AppState state, OnNewTasksDataAction action) =>
+      state.rebuild((AppStateBuilder b) =>
+          b..tasks.addIterable(action.payload, key: (TaskModel t) => t.id));
+}
+
+/**
+ * Epics
+ */
+
+///
+class OnTasksPageConnectedEpic extends EpicClass<AppState> {
+  final Repository _repository;
+
+  ///
+  OnTasksPageConnectedEpic(this._repository);
+
+  @override
+  Stream<dynamic> call(Stream<dynamic> actions, EpicStore<AppState> store) =>
+      new Observable<Action<dynamic, dynamic>>(actions)
+          .where((Action<dynamic, dynamic> action) =>
+              action is OnTasksPageConnectedAction)
+          .flatMap((Action<dynamic, dynamic> action) => _repository.tasks(
+              userId: store.state.authentication.currentUser.uid,
+              listId: action.payload))
+          .map((Iterable<TaskModel> tasks) => new OnNewTasksDataAction(tasks));
+}
+
+/**
+ * Actions
+ */
+
+///
+class OnTasksPageConnectedAction extends Action<String, Null> {
+  ///
+  OnTasksPageConnectedAction({String listId}) : super(payload: listId);
+}
+
+///
+class OnNewTasksDataAction extends Action<Iterable<TaskModel>, Null> {
+  ///
+  OnNewTasksDataAction(Iterable<TaskModel> payload) : super(payload: payload);
 }
 
 ///

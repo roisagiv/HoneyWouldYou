@@ -2,7 +2,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:honeywouldyou/auth/signup_page_container.dart';
 import 'package:honeywouldyou/data/models.dart';
-import 'package:honeywouldyou/home/home_page.dart';
+import 'package:honeywouldyou/lists/lists_page.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/tasks/tasks_page.dart';
 import 'package:redux/redux.dart';
@@ -25,7 +25,7 @@ class Navigation {
           handlerFunc: (BuildContext context, Map<String, dynamic> params) {
         if (store.state.authentication.authenticationStatus ==
             AuthenticationStatus.authenticated) {
-          return new HomePage(this);
+          return new ListsPage(this);
         } else {
           return const SignUpPageContainer();
         }

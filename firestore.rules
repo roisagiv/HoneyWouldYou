@@ -1,0 +1,27 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner() {
+      return resource.data.owner != null 
+        && request.auth.uid == resource.data.owner;
+    }
+
+    function isParticipant() {
+      return resource.data.participants != null 
+        && resource.data.participants[request.auth.uid] is int;
+    }
+
+    match /lists/{anyList} {
+    	allow read, update: if request.auth != null && (isOwner() || isParticipant());
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null && (isOwner());
+    }
+
+    match /tasks/{anyTask} {
+    	allow read, update: if request.auth != null && (isOwner() || isParticipant());
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null && (isOwner());
+    }
+
+  }
+}

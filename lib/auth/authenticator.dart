@@ -36,6 +36,9 @@ abstract class AuthenticatedUser {
 
   /// The user’s email address.
   String get email;
+
+  ///
+  String get id;
 }
 
 ///
@@ -106,4 +109,7 @@ class FirebaseAuthenticatedUser implements AuthenticatedUser {
 
   @override
   String get photoUrl => _firebaseUser.photoUrl;
+
+  @override
+  String get id => _firebaseUser.uid;
 }

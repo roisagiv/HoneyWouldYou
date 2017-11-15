@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of redux;
+part of honeywouldyou.redux;
 
 // **************************************************************************
 // Generator: BuiltValueGenerator
@@ -16,15 +16,18 @@ part of redux;
 
 class _$AppState extends AppState {
   @override
-  final BuiltList<ListModel> lists;
+  final BuiltMap<String, ListModel> lists;
   @override
-  final Authentication authentication;
+  final BuiltMap<String, TaskModel> tasks;
+  @override
+  final AuthenticationModel authentication;
 
   factory _$AppState([void updates(AppStateBuilder b)]) =>
       (new AppStateBuilder()..update(updates)).build();
 
-  _$AppState._({this.lists, this.authentication}) : super._() {
+  _$AppState._({this.lists, this.tasks, this.authentication}) : super._() {
     if (lists == null) throw new ArgumentError.notNull('lists');
+    if (tasks == null) throw new ArgumentError.notNull('tasks');
     if (authentication == null)
       throw new ArgumentError.notNull('authentication');
   }
@@ -40,18 +43,22 @@ class _$AppState extends AppState {
   bool operator ==(dynamic other) {
     if (identical(other, this)) return true;
     if (other is! AppState) return false;
-    return lists == other.lists && authentication == other.authentication;
+    return lists == other.lists &&
+        tasks == other.tasks &&
+        authentication == other.authentication;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc(0, lists.hashCode), authentication.hashCode));
+    return $jf($jc(
+        $jc($jc(0, lists.hashCode), tasks.hashCode), authentication.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('AppState')
           ..add('lists', lists)
+          ..add('tasks', tasks)
           ..add('authentication', authentication))
         .toString();
   }
@@ -60,15 +67,20 @@ class _$AppState extends AppState {
 class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   _$AppState _$v;
 
-  ListBuilder<ListModel> _lists;
-  ListBuilder<ListModel> get lists =>
-      _$this._lists ??= new ListBuilder<ListModel>();
-  set lists(ListBuilder<ListModel> lists) => _$this._lists = lists;
+  MapBuilder<String, ListModel> _lists;
+  MapBuilder<String, ListModel> get lists =>
+      _$this._lists ??= new MapBuilder<String, ListModel>();
+  set lists(MapBuilder<String, ListModel> lists) => _$this._lists = lists;
 
-  AuthenticationBuilder _authentication;
-  AuthenticationBuilder get authentication =>
-      _$this._authentication ??= new AuthenticationBuilder();
-  set authentication(AuthenticationBuilder authentication) =>
+  MapBuilder<String, TaskModel> _tasks;
+  MapBuilder<String, TaskModel> get tasks =>
+      _$this._tasks ??= new MapBuilder<String, TaskModel>();
+  set tasks(MapBuilder<String, TaskModel> tasks) => _$this._tasks = tasks;
+
+  AuthenticationModelBuilder _authentication;
+  AuthenticationModelBuilder get authentication =>
+      _$this._authentication ??= new AuthenticationModelBuilder();
+  set authentication(AuthenticationModelBuilder authentication) =>
       _$this._authentication = authentication;
 
   AppStateBuilder();
@@ -76,6 +88,7 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   AppStateBuilder get _$this {
     if (_$v != null) {
       _lists = _$v.lists?.toBuilder();
+      _tasks = _$v.tasks?.toBuilder();
       _authentication = _$v.authentication?.toBuilder();
       _$v = null;
     }
@@ -97,13 +110,15 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
   _$AppState build() {
     final _$result = _$v ??
         new _$AppState._(
-            lists: lists?.build(), authentication: authentication?.build());
+            lists: lists?.build(),
+            tasks: tasks?.build(),
+            authentication: authentication?.build());
     replace(_$result);
     return _$result;
   }
 }
 
-class _$Authentication extends Authentication {
+class _$AuthenticationModel extends AuthenticationModel {
   @override
   final UserModel currentUser;
   @override
@@ -111,10 +126,10 @@ class _$Authentication extends Authentication {
   @override
   final String errorMessage;
 
-  factory _$Authentication([void updates(AuthenticationBuilder b)]) =>
-      (new AuthenticationBuilder()..update(updates)).build();
+  factory _$AuthenticationModel([void updates(AuthenticationModelBuilder b)]) =>
+      (new AuthenticationModelBuilder()..update(updates)).build();
 
-  _$Authentication._(
+  _$AuthenticationModel._(
       {this.currentUser, this.authenticationStatus, this.errorMessage})
       : super._() {
     if (authenticationStatus == null)
@@ -122,17 +137,17 @@ class _$Authentication extends Authentication {
   }
 
   @override
-  Authentication rebuild(void updates(AuthenticationBuilder b)) =>
+  AuthenticationModel rebuild(void updates(AuthenticationModelBuilder b)) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuthenticationBuilder toBuilder() =>
-      new AuthenticationBuilder()..replace(this);
+  AuthenticationModelBuilder toBuilder() =>
+      new AuthenticationModelBuilder()..replace(this);
 
   @override
   bool operator ==(dynamic other) {
     if (identical(other, this)) return true;
-    if (other is! Authentication) return false;
+    if (other is! AuthenticationModel) return false;
     return currentUser == other.currentUser &&
         authenticationStatus == other.authenticationStatus &&
         errorMessage == other.errorMessage;
@@ -147,7 +162,7 @@ class _$Authentication extends Authentication {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper('Authentication')
+    return (newBuiltValueToStringHelper('AuthenticationModel')
           ..add('currentUser', currentUser)
           ..add('authenticationStatus', authenticationStatus)
           ..add('errorMessage', errorMessage))
@@ -155,9 +170,9 @@ class _$Authentication extends Authentication {
   }
 }
 
-class AuthenticationBuilder
-    implements Builder<Authentication, AuthenticationBuilder> {
-  _$Authentication _$v;
+class AuthenticationModelBuilder
+    implements Builder<AuthenticationModel, AuthenticationModelBuilder> {
+  _$AuthenticationModel _$v;
 
   UserModelBuilder _currentUser;
   UserModelBuilder get currentUser =>
@@ -174,9 +189,9 @@ class AuthenticationBuilder
   String get errorMessage => _$this._errorMessage;
   set errorMessage(String errorMessage) => _$this._errorMessage = errorMessage;
 
-  AuthenticationBuilder();
+  AuthenticationModelBuilder();
 
-  AuthenticationBuilder get _$this {
+  AuthenticationModelBuilder get _$this {
     if (_$v != null) {
       _currentUser = _$v.currentUser?.toBuilder();
       _authenticationStatus = _$v.authenticationStatus;
@@ -187,20 +202,20 @@ class AuthenticationBuilder
   }
 
   @override
-  void replace(Authentication other) {
+  void replace(AuthenticationModel other) {
     if (other == null) throw new ArgumentError.notNull('other');
-    _$v = other as _$Authentication;
+    _$v = other as _$AuthenticationModel;
   }
 
   @override
-  void update(void updates(AuthenticationBuilder b)) {
+  void update(void updates(AuthenticationModelBuilder b)) {
     if (updates != null) updates(this);
   }
 
   @override
-  _$Authentication build() {
+  _$AuthenticationModel build() {
     final _$result = _$v ??
-        new _$Authentication._(
+        new _$AuthenticationModel._(
             currentUser: _currentUser?.build(),
             authenticationStatus: authenticationStatus,
             errorMessage: errorMessage);

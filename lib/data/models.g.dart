@@ -70,6 +70,9 @@ class _$TaskModelSerializer implements StructuredSerializer<TaskModel> {
       'completed',
       serializers.serialize(object.completed,
           specifiedType: const FullType(bool)),
+      'listId',
+      serializers.serialize(object.listId,
+          specifiedType: const FullType(String)),
     ];
 
     return result;
@@ -98,6 +101,10 @@ class _$TaskModelSerializer implements StructuredSerializer<TaskModel> {
           result.completed = serializers.deserialize(value,
               specifiedType: const FullType(bool)) as bool;
           break;
+        case 'listId':
+          result.listId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
       }
     }
 
@@ -119,10 +126,9 @@ class _$ListModelSerializer implements StructuredSerializer<ListModel> {
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'name',
       serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'tasks',
-      serializers.serialize(object.tasks,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(TaskModel)])),
+      'tasksCount',
+      serializers.serialize(object.tasksCount,
+          specifiedType: const FullType(int)),
     ];
 
     return result;
@@ -147,11 +153,9 @@ class _$ListModelSerializer implements StructuredSerializer<ListModel> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'tasks':
-          result.tasks.replace(serializers.deserialize(value,
-                  specifiedType: const FullType(
-                      BuiltList, const [const FullType(TaskModel)]))
-              as BuiltList<TaskModel>);
+        case 'tasksCount':
+          result.tasksCount = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
           break;
       }
     }
@@ -167,14 +171,17 @@ class _$TaskModel extends TaskModel {
   final String name;
   @override
   final bool completed;
+  @override
+  final String listId;
 
   factory _$TaskModel([void updates(TaskModelBuilder b)]) =>
       (new TaskModelBuilder()..update(updates)).build();
 
-  _$TaskModel._({this.id, this.name, this.completed}) : super._() {
+  _$TaskModel._({this.id, this.name, this.completed, this.listId}) : super._() {
     if (id == null) throw new ArgumentError.notNull('id');
     if (name == null) throw new ArgumentError.notNull('name');
     if (completed == null) throw new ArgumentError.notNull('completed');
+    if (listId == null) throw new ArgumentError.notNull('listId');
   }
 
   @override
@@ -188,13 +195,17 @@ class _$TaskModel extends TaskModel {
   bool operator ==(dynamic other) {
     if (identical(other, this)) return true;
     if (other is! TaskModel) return false;
-    return id == other.id && name == other.name && completed == other.completed;
+    return id == other.id &&
+        name == other.name &&
+        completed == other.completed &&
+        listId == other.listId;
   }
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, id.hashCode), name.hashCode), completed.hashCode));
+    return $jf($jc(
+        $jc($jc($jc(0, id.hashCode), name.hashCode), completed.hashCode),
+        listId.hashCode));
   }
 
   @override
@@ -202,7 +213,8 @@ class _$TaskModel extends TaskModel {
     return (newBuiltValueToStringHelper('TaskModel')
           ..add('id', id)
           ..add('name', name)
-          ..add('completed', completed))
+          ..add('completed', completed)
+          ..add('listId', listId))
         .toString();
   }
 }
@@ -222,6 +234,10 @@ class TaskModelBuilder implements Builder<TaskModel, TaskModelBuilder> {
   bool get completed => _$this._completed;
   set completed(bool completed) => _$this._completed = completed;
 
+  String _listId;
+  String get listId => _$this._listId;
+  set listId(String listId) => _$this._listId = listId;
+
   TaskModelBuilder();
 
   TaskModelBuilder get _$this {
@@ -229,6 +245,7 @@ class TaskModelBuilder implements Builder<TaskModel, TaskModelBuilder> {
       _id = _$v.id;
       _name = _$v.name;
       _completed = _$v.completed;
+      _listId = _$v.listId;
       _$v = null;
     }
     return this;
@@ -247,8 +264,9 @@ class TaskModelBuilder implements Builder<TaskModel, TaskModelBuilder> {
 
   @override
   _$TaskModel build() {
-    final _$result =
-        _$v ?? new _$TaskModel._(id: id, name: name, completed: completed);
+    final _$result = _$v ??
+        new _$TaskModel._(
+            id: id, name: name, completed: completed, listId: listId);
     replace(_$result);
     return _$result;
   }
@@ -260,15 +278,15 @@ class _$ListModel extends ListModel {
   @override
   final String name;
   @override
-  final BuiltList<TaskModel> tasks;
+  final int tasksCount;
 
   factory _$ListModel([void updates(ListModelBuilder b)]) =>
       (new ListModelBuilder()..update(updates)).build();
 
-  _$ListModel._({this.id, this.name, this.tasks}) : super._() {
+  _$ListModel._({this.id, this.name, this.tasksCount}) : super._() {
     if (id == null) throw new ArgumentError.notNull('id');
     if (name == null) throw new ArgumentError.notNull('name');
-    if (tasks == null) throw new ArgumentError.notNull('tasks');
+    if (tasksCount == null) throw new ArgumentError.notNull('tasksCount');
   }
 
   @override
@@ -282,12 +300,15 @@ class _$ListModel extends ListModel {
   bool operator ==(dynamic other) {
     if (identical(other, this)) return true;
     if (other is! ListModel) return false;
-    return id == other.id && name == other.name && tasks == other.tasks;
+    return id == other.id &&
+        name == other.name &&
+        tasksCount == other.tasksCount;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, id.hashCode), name.hashCode), tasks.hashCode));
+    return $jf(
+        $jc($jc($jc(0, id.hashCode), name.hashCode), tasksCount.hashCode));
   }
 
   @override
@@ -295,7 +316,7 @@ class _$ListModel extends ListModel {
     return (newBuiltValueToStringHelper('ListModel')
           ..add('id', id)
           ..add('name', name)
-          ..add('tasks', tasks))
+          ..add('tasksCount', tasksCount))
         .toString();
   }
 }
@@ -311,10 +332,9 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
 
-  ListBuilder<TaskModel> _tasks;
-  ListBuilder<TaskModel> get tasks =>
-      _$this._tasks ??= new ListBuilder<TaskModel>();
-  set tasks(ListBuilder<TaskModel> tasks) => _$this._tasks = tasks;
+  int _tasksCount;
+  int get tasksCount => _$this._tasksCount;
+  set tasksCount(int tasksCount) => _$this._tasksCount = tasksCount;
 
   ListModelBuilder();
 
@@ -322,7 +342,7 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
     if (_$v != null) {
       _id = _$v.id;
       _name = _$v.name;
-      _tasks = _$v.tasks?.toBuilder();
+      _tasksCount = _$v.tasksCount;
       _$v = null;
     }
     return this;
@@ -342,7 +362,7 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
   @override
   _$ListModel build() {
     final _$result =
-        _$v ?? new _$ListModel._(id: id, name: name, tasks: tasks?.build());
+        _$v ?? new _$ListModel._(id: id, name: name, tasksCount: tasksCount);
     replace(_$result);
     return _$result;
   }

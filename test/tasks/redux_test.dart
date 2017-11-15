@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:honeywouldyou/home/redux.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/tasks/redux.dart';
 import 'package:redux/redux.dart';
 import 'package:test/test.dart';
 
-import '../data/testable_list_repository.dart';
+import '../auth/testable_authenticator.dart';
+import '../data/testable_repository.dart';
 
 ///
 void main() {
@@ -14,8 +14,13 @@ void main() {
   group('tasks', () {
     Store<AppState> store;
     setUp(() async {
-      store = createStore(listRepository: new TestableListRepository())
-        ..dispatch(new OnHomePageConnectedAction());
+      store = createStore(
+          repository: new TestableRepository(),
+          authenticator: new TestableAuthenticator.configured())
+        ..dispatch(new OnSplashInitAction());
+
+      await new Future<Null>.delayed(new Duration(milliseconds: 100));
+      store.dispatch(new OnTasksPageConnectedAction(listId: ''));
 
       await new Future<Null>.delayed(new Duration(milliseconds: 100));
     });
@@ -24,11 +29,11 @@ void main() {
     test('OnTaskCompleteToggledAction', () async {
       store.dispatch(new OnTaskCompleteToggledAction(
           const OnTaskCompleteToggledData(
-              taskId: '59e6ee115379cbbf5bc402d5',
+              taskId: '5a0edd1baac0f24cb45c4f2c',
               listId: '59e6ee11e01f193d97235993',
               completed: true)));
 
-      expect(store.state.lists[1].tasks[2].completed, true);
+      expect(store.state.tasks['5a0edd1baac0f24cb45c4f2c'].completed, true);
     });
 
     ///
@@ -38,7 +43,7 @@ void main() {
         listId: '59e6ee11e01f193d97235993',
       )));
 
-      expect(store.state.lists[1].tasks.length, 7);
+      expect(store.state.tasks.length, 7);
     });
   });
 }

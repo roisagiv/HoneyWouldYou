@@ -16,8 +16,5 @@ part of serializers;
 
 Serializers _$serializers = (new Serializers().toBuilder()
       ..add(ListModel.serializer)
-      ..add(TaskModel.serializer)
-      ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(TaskModel)]),
-          () => new ListBuilder<TaskModel>()))
+      ..add(TaskModel.serializer))
     .build();

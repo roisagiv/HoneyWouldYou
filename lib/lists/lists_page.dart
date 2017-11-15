@@ -4,6 +4,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:honeywouldyou/data/models.dart';
+import 'package:honeywouldyou/lists/redux.dart';
 import 'package:honeywouldyou/navigation.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/theme.dart';
@@ -19,35 +20,35 @@ typedef void NewListItem(String name);
 class _ViewModel {
   final List<ListModel> lists;
   final NewListItem newListItemFunction;
-  final VoidCallback onAttachedFunction;
   final VoidCallback onLogoutButtonClicked;
 
-  const _ViewModel(this.lists, this.newListItemFunction,
-      this.onAttachedFunction, this.onLogoutButtonClicked);
+  const _ViewModel(
+      this.lists, this.newListItemFunction, this.onLogoutButtonClicked);
 }
 
 ///
-class HomePage extends StatelessWidget {
+class ListsPage extends StatelessWidget {
   final Navigation _navigation;
 
   ///
-  const HomePage(this._navigation);
+  const ListsPage(this._navigation);
 
   @override
   Widget build(BuildContext context) =>
       new StoreConnector<AppState, _ViewModel>(
+        onInit: (Store<dynamic> store) =>
+            store.dispatch(new OnListsPageConnectedAction()),
         converter: (Store<AppState> store) => new _ViewModel(
-            store.state.lists.toList(),
+            store.state.lists.values.toList(),
             (String name) =>
                 store.dispatch(new OnAddNewListSaveClickedAction(name)),
-            () => store.dispatch(new OnHomePageConnectedAction()),
             () => store.dispatch(new OnSignOutButtonClickedAction())),
         builder: (BuildContext context, _ViewModel viewModel) => new Scaffold(
               appBar: _buildAppBar(context, viewModel),
               body: new Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.screenEdgeMargin),
-                child: new ListsContainer(viewModel, _navigation),
+                child: new ListsWidget(viewModel.lists, _navigation),
               ),
               bottomNavigationBar: new Container(
                 height: AppDimens.bottomNavigationBarHeight,
@@ -122,39 +123,6 @@ class HomePage extends StatelessWidget {
 }
 
 ///
-class ListsContainer extends StatefulWidget {
-  final _ViewModel _viewModel;
-  final Navigation _navigation;
-
-  ///
-  const ListsContainer(this._viewModel, this._navigation);
-
-  @override
-  State createState() => new _ListsContainerState(_viewModel, _navigation);
-}
-
-class _ListsContainerState extends State<ListsContainer> {
-  final _ViewModel _viewModel;
-  final Navigation _navigation;
-
-  _ListsContainerState(_ViewModel _viewModel, this._navigation)
-      : _viewModel = _viewModel;
-
-  @override
-  void initState() {
-    super.initState();
-    _viewModel.onAttachedFunction();
-  }
-
-  @override
-  Widget build(BuildContext context) =>
-      new StoreConnector<AppState, List<ListModel>>(
-          converter: (Store<AppState> store) => store.state.lists.toList(),
-          builder: (BuildContext context, List<ListModel> lists) =>
-              new ListsWidget(lists, _navigation));
-}
-
-///
 class ListsWidget extends StatelessWidget {
   ///
   final List<ListModel> lists;
@@ -223,7 +191,7 @@ class ListItemWidget extends StatelessWidget {
                                 style: Theme.of(context).textTheme.body1,
                               ),
                               new Text(
-                                '${_list.tasks.length} Tasks',
+                                '${_list.tasksCount} Tasks',
                                 style: Theme.of(context).textTheme.caption,
                               )
                             ],

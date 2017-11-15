@@ -1,12 +1,11 @@
-library redux;
+library honeywouldyou.redux;
 
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
-import 'package:honeywouldyou/auth/authenticator.dart';
 import 'package:honeywouldyou/auth/redux.dart';
-import 'package:honeywouldyou/data/list_repository.dart';
 import 'package:honeywouldyou/data/models.dart';
-import 'package:honeywouldyou/home/redux.dart';
+import 'package:honeywouldyou/lists/redux.dart';
+import 'package:honeywouldyou/services.dart';
 import 'package:honeywouldyou/splash/redux.dart';
 import 'package:honeywouldyou/tasks/redux.dart';
 import 'package:logging/logging.dart';
@@ -15,7 +14,6 @@ import 'package:redux_epics/redux_epics.dart';
 import 'package:redux_logging/redux_logging.dart';
 
 export 'package:honeywouldyou/auth/redux.dart';
-export 'package:honeywouldyou/home/redux.dart';
 export 'package:honeywouldyou/splash/redux.dart';
 export 'package:honeywouldyou/tasks/redux.dart';
 
@@ -23,14 +21,15 @@ part 'redux.g.dart';
 
 ///
 Store<AppState> createStore(
-    {ListRepository listRepository = const ListRepository(),
+    {Repository repository,
     Authenticator authenticator,
     bool logging = false}) {
   final List<Middleware<AppState>> middleware = <Middleware<AppState>>[
     new EpicMiddleware<AppState>(combineEpics(<Epic<AppState>>[
-      new SignOutEpic(authenticator),
-      new HomeEpic(listRepository),
-      new SplashEpic(authenticator)
+      rootAuthEpic(authenticator),
+      new OnTasksPageConnectedEpic(repository),
+      new ListsEpic(repository),
+      new SplashEpic(authenticator),
     ])),
     new LoggingMiddleware<AppState>(
         formatter: LoggingMiddleware.multiLineFormatter, level: Level.INFO)
@@ -42,13 +41,13 @@ Store<AppState> createStore(
 
   return new Store<AppState>(
       combineReducers(<Reducer<AppState>>[
-        new HomeReducer(),
+        new ListsReducer(),
         new TasksReducer(),
         new AuthReducer(),
         new SplashReducer()
       ]),
       initialState: new AppState((AppStateBuilder b) =>
-          b.authentication = new AuthenticationBuilder()
+          b.authentication = new AuthenticationModelBuilder()
             ..authenticationStatus = AuthenticationStatus.notAuthenticated),
       middleware: middleware);
 }
@@ -62,20 +61,24 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   AppState._();
 
   ///
-  BuiltList<ListModel> get lists;
+  BuiltMap<String, ListModel> get lists;
 
   ///
-  Authentication get authentication;
+  BuiltMap<String, TaskModel> get tasks;
+
+  ///
+  AuthenticationModel get authentication;
 }
 
 ///
-abstract class Authentication
-    implements Built<Authentication, AuthenticationBuilder> {
+abstract class AuthenticationModel
+    implements Built<AuthenticationModel, AuthenticationModelBuilder> {
   ///
-  factory Authentication([updates(AuthenticationBuilder b)]) = _$Authentication;
+  factory AuthenticationModel([updates(AuthenticationModelBuilder b)]) =
+      _$AuthenticationModel;
 
   ///
-  Authentication._();
+  AuthenticationModel._();
 
   ///
   @nullable
