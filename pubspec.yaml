@@ -7,20 +7,20 @@ dependencies:
 
   # redux
   redux: 2.0.2
-  rxdart: 0.14.0+2
-  flutter_redux: 0.3.2
-  redux_logging: 0.1.2
-  redux_epics: 0.6.0
+  rxdart: 0.15.0
+  flutter_redux: 0.3.4
+  redux_logging: 0.1.4
+  redux_epics: 0.6.1
 
   # navigation
   fluro: 1.2.1
 
   # immutable
-  built_value: 4.3.3
+  built_value: 4.4.0
 
   # Firebase
   firebase_auth: 0.3.1
-  cloud_firestore: 0.0.4
+  cloud_firestore: 0.1.0
 
   # utils
 
@@ -32,7 +32,7 @@ dev_dependencies:
     sdk: flutter
   
   build_runner: 0.5.0
-  built_value_generator: 4.3.3
+  built_value_generator: 4.4.0
 
 
 # For information on the generic Dart part of this file, see the

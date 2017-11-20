@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:honeywouldyou/lists/redux.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/tasks/redux.dart';
 import 'package:redux/redux.dart';
@@ -7,43 +6,56 @@ import 'package:test/test.dart';
 
 import '../auth/testable_authenticator.dart';
 import '../data/testable_repository.dart';
+import '../utils/utils.dart';
 
 ///
 void main() {
   ///
   group('tasks', () {
+    final String listId = '5a171ecc18a34083114ea3ff';
+
     Store<AppState> store;
+    TestableRepository repository;
+
     setUp(() async {
+      repository = new TestableRepository();
+      await repository.init();
+
       store = createStore(
-          repository: new TestableRepository(),
+          repository: repository,
           authenticator: new TestableAuthenticator.configured())
         ..dispatch(new OnSplashInitAction());
+      await aBit();
 
-      await new Future<Null>.delayed(new Duration(milliseconds: 100));
-      store.dispatch(new OnTasksPageConnectedAction(listId: ''));
+      store.dispatch(new OnListsPageConnectedAction());
+      await aBit();
 
-      await new Future<Null>.delayed(new Duration(milliseconds: 100));
+      store.dispatch(new OnTasksPageConnectedAction(listId: listId));
+      await aBit();
     });
 
     ///
     test('OnTaskCompleteToggledAction', () async {
-      store.dispatch(new OnTaskCompleteToggledAction(
-          const OnTaskCompleteToggledData(
-              taskId: '5a0edd1baac0f24cb45c4f2c',
-              listId: '59e6ee11e01f193d97235993',
-              completed: true)));
+      final String taskId = '5a171ecc046531ef20a1fe4e';
 
-      expect(store.state.tasks['5a0edd1baac0f24cb45c4f2c'].completed, true);
+      store.dispatch(new OnTaskCompleteToggledAction(
+          new OnTaskCompleteToggledData(
+              taskId: taskId, listId: listId, completed: true)));
+
+      await aBit();
+
+      expect(store.state.tasks[taskId].completed, true);
     });
 
     ///
     test('OnAddTaskAction', () async {
+      expect(store.state.tasks.length, 14);
       store.dispatch(new OnAddTaskAction(new OnAddTaskActionData(
         name: 'name name',
-        listId: '59e6ee11e01f193d97235993',
+        listId: listId,
       )));
 
-      expect(store.state.tasks.length, 7);
+      expect(store.state.tasks.length, 15);
     });
   });
 }

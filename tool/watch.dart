@@ -17,7 +17,7 @@ import 'package:source_gen/source_gen.dart';
 Future<ServeHandler> main(List<String> args) async => await watch(<BuildAction>[
       new BuildAction(
           new PartBuilder(<Generator>[
-            new BuiltValueGenerator(),
+            const BuiltValueGenerator(),
           ]),
           'honeywouldyou',
           inputs: const <String>['lib/*.dart'])

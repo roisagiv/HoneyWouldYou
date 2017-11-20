@@ -15,7 +15,7 @@ import 'package:source_gen/source_gen.dart';
 Future<BuildResult> main(List<String> args) async => await build(<BuildAction>[
       new BuildAction(
           new PartBuilder(<Generator>[
-            new BuiltValueGenerator(),
+            const BuiltValueGenerator(),
           ]),
           'honeywouldyou',
           inputs: const <String>[

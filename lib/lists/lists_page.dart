@@ -16,14 +16,21 @@ import 'package:redux/redux.dart';
 ///
 typedef void NewListItem(String name);
 
+///
+typedef void RemoveListItem(String listId);
+
 @immutable
 class _ViewModel {
   final List<ListModel> lists;
   final NewListItem newListItemFunction;
+  final RemoveListItem removeListItemFunction;
   final VoidCallback onLogoutButtonClicked;
 
   const _ViewModel(
-      this.lists, this.newListItemFunction, this.onLogoutButtonClicked);
+      {this.lists,
+      this.newListItemFunction,
+      this.onLogoutButtonClicked,
+      this.removeListItemFunction});
 }
 
 ///
@@ -39,16 +46,19 @@ class ListsPage extends StatelessWidget {
         onInit: (Store<dynamic> store) =>
             store.dispatch(new OnListsPageConnectedAction()),
         converter: (Store<AppState> store) => new _ViewModel(
-            store.state.lists.values.toList(),
-            (String name) =>
+            lists: store.state.lists.values.toList(),
+            newListItemFunction: (String name) =>
                 store.dispatch(new OnAddNewListSaveClickedAction(name)),
-            () => store.dispatch(new OnSignOutButtonClickedAction())),
+            removeListItemFunction: (String listId) =>
+                store.dispatch(new OnRemoveListClickedAction(listId)),
+            onLogoutButtonClicked: () =>
+                store.dispatch(new OnSignOutButtonClickedAction())),
         builder: (BuildContext context, _ViewModel viewModel) => new Scaffold(
               appBar: _buildAppBar(context, viewModel),
               body: new Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.screenEdgeMargin),
-                child: new ListsWidget(viewModel.lists, _navigation),
+                child: new ListsWidget(_navigation, viewModel),
               ),
               bottomNavigationBar: new Container(
                 height: AppDimens.bottomNavigationBarHeight,
@@ -124,22 +134,21 @@ class ListsPage extends StatelessWidget {
 
 ///
 class ListsWidget extends StatelessWidget {
-  ///
-  final List<ListModel> lists;
+  final _ViewModel _viewModel;
 
   final Navigation _navigation;
 
   ///
-  const ListsWidget(this.lists, this._navigation);
+  const ListsWidget(this._navigation, this._viewModel);
 
   @override
   Widget build(BuildContext context) => new ListView.builder(
         padding: const EdgeInsets.symmetric(
             vertical: AppDimens.listViewPadding + AppDimens.screenEdgeMargin,
             horizontal: AppDimens.listViewPadding),
-        itemBuilder: (BuildContext context, int index) =>
-            new ListItemWidget(lists[index], _navigation),
-        itemCount: lists.length,
+        itemBuilder: (BuildContext context, int index) => new ListItemWidget(
+            _viewModel.lists[index], _navigation, _viewModel),
+        itemCount: _viewModel.lists.length,
       );
 }
 
@@ -147,10 +156,11 @@ class ListsWidget extends StatelessWidget {
 class ListItemWidget extends StatelessWidget {
   ///
   final ListModel _list;
+  final _ViewModel _viewModel;
   final Navigation _navigation;
 
   ///
-  const ListItemWidget(this._list, this._navigation);
+  const ListItemWidget(this._list, this._navigation, this._viewModel);
 
   @override
   Widget build(BuildContext context) {
@@ -191,18 +201,29 @@ class ListItemWidget extends StatelessWidget {
                                 style: Theme.of(context).textTheme.body1,
                               ),
                               new Text(
-                                '${_list.tasksCount} Tasks',
+                                '${_list.tasks?.length} Tasks',
                                 style: Theme.of(context).textTheme.caption,
                               )
                             ],
                           ),
                         )),
-                    new IconButton(
-                      alignment: Alignment.centerRight,
-                      icon: new Icon(Icons.more_vert),
-                      onPressed: () => Null,
-                      color: AppColors.manatee,
-                    )
+                    new PopupMenuButton<String>(
+                        icon: new Icon(
+                          Icons.more_vert,
+                          color: AppColors.manatee,
+                        ),
+                        onSelected: (String _) =>
+                            _viewModel.removeListItemFunction(_list.id),
+                        itemBuilder: (BuildContext context) =>
+                            <PopupMenuEntry<String>>[
+                              new PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: new ListTile(
+                                    dense: true,
+                                    leading: new Icon(Icons.delete),
+                                    title: new Text('Delete'),
+                                  )),
+                            ]),
                   ],
                 ),
               ))),

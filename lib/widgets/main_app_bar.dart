@@ -12,7 +12,7 @@ class MainAppBar extends AppBar {
       : super(
             title: title,
             bottom: new BottomAppBar(
-              subtitle: subtitle ?? new Text(''),
+              subtitle: subtitle,
             ),
             leading: leading,
             actions: actions);

@@ -8,7 +8,6 @@ import 'package:honeywouldyou/lists/redux.dart';
 import 'package:honeywouldyou/services.dart';
 import 'package:honeywouldyou/splash/redux.dart';
 import 'package:honeywouldyou/tasks/redux.dart';
-import 'package:logging/logging.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_epics/redux_epics.dart';
 import 'package:redux_logging/redux_logging.dart';
@@ -27,12 +26,12 @@ Store<AppState> createStore(
   final List<Middleware<AppState>> middleware = <Middleware<AppState>>[
     new EpicMiddleware<AppState>(combineEpics(<Epic<AppState>>[
       rootAuthEpic(authenticator),
-      new OnTasksPageConnectedEpic(repository),
-      new ListsEpic(repository),
+      rootListsEpic(repository: repository),
+      rootTasksEpic(repository: repository),
       new SplashEpic(authenticator),
     ])),
-    new LoggingMiddleware<AppState>(
-        formatter: LoggingMiddleware.multiLineFormatter, level: Level.INFO)
+    new LoggingMiddleware<AppState>.printer(
+        formatter: LoggingMiddleware.multiLineFormatter)
   ];
 
   if (logging == false) {

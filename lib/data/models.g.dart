@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of models;
+part of honeywouldyou.models;
 
 // **************************************************************************
 // Generator: BuiltValueGenerator
@@ -126,10 +126,14 @@ class _$ListModelSerializer implements StructuredSerializer<ListModel> {
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'name',
       serializers.serialize(object.name, specifiedType: const FullType(String)),
-      'tasksCount',
-      serializers.serialize(object.tasksCount,
-          specifiedType: const FullType(int)),
     ];
+    if (object.tasks != null) {
+      result
+        ..add('tasks')
+        ..add(serializers.serialize(object.tasks,
+            specifiedType: const FullType(BuiltMap,
+                const [const FullType(String), const FullType(TaskModel)])));
+    }
 
     return result;
   }
@@ -153,9 +157,12 @@ class _$ListModelSerializer implements StructuredSerializer<ListModel> {
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
           break;
-        case 'tasksCount':
-          result.tasksCount = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+        case 'tasks':
+          result.tasks.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltMap, const [
+                const FullType(String),
+                const FullType(TaskModel)
+              ])) as BuiltMap<String, TaskModel>);
           break;
       }
     }
@@ -278,15 +285,14 @@ class _$ListModel extends ListModel {
   @override
   final String name;
   @override
-  final int tasksCount;
+  final BuiltMap<String, TaskModel> tasks;
 
   factory _$ListModel([void updates(ListModelBuilder b)]) =>
       (new ListModelBuilder()..update(updates)).build();
 
-  _$ListModel._({this.id, this.name, this.tasksCount}) : super._() {
+  _$ListModel._({this.id, this.name, this.tasks}) : super._() {
     if (id == null) throw new ArgumentError.notNull('id');
     if (name == null) throw new ArgumentError.notNull('name');
-    if (tasksCount == null) throw new ArgumentError.notNull('tasksCount');
   }
 
   @override
@@ -300,15 +306,12 @@ class _$ListModel extends ListModel {
   bool operator ==(dynamic other) {
     if (identical(other, this)) return true;
     if (other is! ListModel) return false;
-    return id == other.id &&
-        name == other.name &&
-        tasksCount == other.tasksCount;
+    return id == other.id && name == other.name && tasks == other.tasks;
   }
 
   @override
   int get hashCode {
-    return $jf(
-        $jc($jc($jc(0, id.hashCode), name.hashCode), tasksCount.hashCode));
+    return $jf($jc($jc($jc(0, id.hashCode), name.hashCode), tasks.hashCode));
   }
 
   @override
@@ -316,7 +319,7 @@ class _$ListModel extends ListModel {
     return (newBuiltValueToStringHelper('ListModel')
           ..add('id', id)
           ..add('name', name)
-          ..add('tasksCount', tasksCount))
+          ..add('tasks', tasks))
         .toString();
   }
 }
@@ -332,9 +335,10 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
 
-  int _tasksCount;
-  int get tasksCount => _$this._tasksCount;
-  set tasksCount(int tasksCount) => _$this._tasksCount = tasksCount;
+  MapBuilder<String, TaskModel> _tasks;
+  MapBuilder<String, TaskModel> get tasks =>
+      _$this._tasks ??= new MapBuilder<String, TaskModel>();
+  set tasks(MapBuilder<String, TaskModel> tasks) => _$this._tasks = tasks;
 
   ListModelBuilder();
 
@@ -342,7 +346,7 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
     if (_$v != null) {
       _id = _$v.id;
       _name = _$v.name;
-      _tasksCount = _$v.tasksCount;
+      _tasks = _$v.tasks?.toBuilder();
       _$v = null;
     }
     return this;
@@ -362,7 +366,7 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
   @override
   _$ListModel build() {
     final _$result =
-        _$v ?? new _$ListModel._(id: id, name: name, tasksCount: tasksCount);
+        _$v ?? new _$ListModel._(id: id, name: name, tasks: _tasks?.build());
     replace(_$result);
     return _$result;
   }

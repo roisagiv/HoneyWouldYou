@@ -45,7 +45,7 @@ class TasksPage extends StatelessWidget {
                     color: AppColors.manatee,
                   ),
                   subtitle: new Text(
-                    '${viewModel.list.tasksCount} Tasks',
+                    '${viewModel.list.tasks?.length} Tasks',
                     style: AppTextStyles.appBarSubtitle(context),
                   ),
                 ),

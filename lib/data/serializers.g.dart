@@ -16,5 +16,9 @@ part of serializers;
 
 Serializers _$serializers = (new Serializers().toBuilder()
       ..add(ListModel.serializer)
-      ..add(TaskModel.serializer))
+      ..add(TaskModel.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(String), const FullType(TaskModel)]),
+          () => new MapBuilder<String, TaskModel>()))
     .build();

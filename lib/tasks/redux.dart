@@ -25,10 +25,10 @@ class TasksReducer extends ReducerClass<AppState> {
     return state.toBuilder().build();
   }
 
+  ///
   AppState _onTaskCompleteToggled(
       AppState state, OnTaskCompleteToggledAction action) {
-    TaskModel updatedTask = state.tasks.values
-        .singleWhere((TaskModel t) => t.id == action.payload.taskId);
+    TaskModel updatedTask = state.tasks[action.payload.taskId];
 
     updatedTask = updatedTask.rebuild(
         (TaskModelBuilder b) => b.completed = action.payload.completed);
@@ -40,6 +40,7 @@ class TasksReducer extends ReducerClass<AppState> {
           .toBuilder());
   }
 
+  ///
   AppState _onAddTask(AppState state, OnAddTaskAction action) {
     final TaskModel taskModel = new TaskModel((TaskModelBuilder b) {
       b
@@ -56,6 +57,7 @@ class TasksReducer extends ReducerClass<AppState> {
           .toBuilder());
   }
 
+  ///
   AppState _onNewTasksDataAction(AppState state, OnNewTasksDataAction action) =>
       state.rebuild((AppStateBuilder b) =>
           b..tasks.addIterable(action.payload, key: (TaskModel t) => t.id));
@@ -66,11 +68,11 @@ class TasksReducer extends ReducerClass<AppState> {
  */
 
 ///
-class OnTasksPageConnectedEpic extends EpicClass<AppState> {
+class _OnTasksPageConnectedEpic extends EpicClass<AppState> {
   final Repository _repository;
 
   ///
-  OnTasksPageConnectedEpic(this._repository);
+  _OnTasksPageConnectedEpic(this._repository);
 
   @override
   Stream<dynamic> call(Stream<dynamic> actions, EpicStore<AppState> store) =>
@@ -82,6 +84,12 @@ class OnTasksPageConnectedEpic extends EpicClass<AppState> {
               listId: action.payload))
           .map((Iterable<TaskModel> tasks) => new OnNewTasksDataAction(tasks));
 }
+
+///
+Epic<AppState> rootTasksEpic({Repository repository}) =>
+    combineEpics(<Epic<AppState>>[
+      new _OnTasksPageConnectedEpic(repository),
+    ]);
 
 /**
  * Actions

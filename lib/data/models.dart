@@ -1,4 +1,4 @@
-library models;
+library honeywouldyou.models;
 
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
@@ -44,11 +44,21 @@ abstract class ListModel implements Built<ListModel, ListModelBuilder> {
   factory ListModel([updates(ListModelBuilder b)]) = _$ListModel;
 
   ///
-  factory ListModel.fromMap(Map<String, dynamic> map) =>
-      new ListModel((ListModelBuilder b) => b
-        ..name = map['title']
-        ..id = map['_id']
-        ..tasksCount = map['tasksCount'] ?? 0);
+  factory ListModel.fromMap(Map<String, dynamic> map) {
+    final String listId = map['_id'];
+
+    final Iterable<TaskModel> tasks = map['tasks']
+        .map((Map<String, dynamic> t) => new TaskModel.fromMap(t, listId));
+
+    final MapBuilder<String, TaskModel> tasksBuilder =
+        new MapBuilder<String, TaskModel>()
+          ..addIterable(tasks, key: (TaskModel t) => t.id);
+
+    return new ListModel((ListModelBuilder b) => b
+      ..name = map['title']
+      ..id = listId
+      ..tasks = tasksBuilder);
+  }
 
   ///
   ListModel._();
@@ -60,7 +70,8 @@ abstract class ListModel implements Built<ListModel, ListModelBuilder> {
   String get name;
 
   ///
-  int get tasksCount;
+  @nullable
+  BuiltMap<String, TaskModel> get tasks;
 
   ///
   static Serializer<ListModel> get serializer => _$listModelSerializer;
