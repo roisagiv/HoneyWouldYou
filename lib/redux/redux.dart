@@ -31,7 +31,7 @@ Store<AppState> createStore(
       new SplashEpic(authenticator),
     ])),
     new LoggingMiddleware<AppState>.printer(
-        formatter: LoggingMiddleware.multiLineFormatter)
+        formatter: LoggingMiddleware.singleLineFormatter)
   ];
 
   if (logging == false) {
@@ -108,3 +108,6 @@ abstract class Action<Payload, Meta> {
   ///
   String get type => '$runtimeType';
 }
+
+///
+class OnRepositoryTaskCompletedAction extends Action<Null, Null> {}

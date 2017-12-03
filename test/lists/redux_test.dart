@@ -18,7 +18,7 @@ void main() {
       await repository.init();
 
       store = createStore(
-          logging: true,
+          logging: false,
           repository: repository,
           authenticator: new TestableAuthenticator.configured())
         ..dispatch(new OnSplashInitAction());
@@ -29,21 +29,21 @@ void main() {
     });
 
     test('OnListsPageConnectedAction', () async {
-      expect(store.state.lists.length, 7);
+      expect(store.state.lists.length, 10);
     });
 
     test('OnAddNewListSaveClickedAction', () async {
       store.dispatch(new OnAddNewListSaveClickedAction('new list'));
       await aBit();
-      expect(store.state.lists.length, 8);
+      expect(store.state.lists.length, 11);
 
       final ListModel list = store.state.lists.values
           .firstWhere((ListModel l) => l.name == 'new list');
 
-      expect(repository.lastAddedTask, list);
+      expect(repository.lastAddedList, list);
 
       expect(list.name, 'new list');
-      expect(list.tasks?.length, 0);
+      expect(store.state.tasks?.length, 0);
       expect(list.id, isNotEmpty);
     });
 
@@ -53,7 +53,7 @@ void main() {
 
       await aBit();
 
-      expect(store.state.lists.length, 6);
+      expect(store.state.lists.length, 9);
       expect(repository.lastRemovedListId, listId);
     });
   });

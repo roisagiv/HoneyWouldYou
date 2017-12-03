@@ -150,4 +150,7 @@ class AppDimens {
   ///
   static const double listViewPadding =
       (screenContentMargin - screenEdgeMargin) / 2;
+
+  ///
+  static const double taskItemHeight = 64.0;
 }

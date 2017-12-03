@@ -127,13 +127,6 @@ class _$ListModelSerializer implements StructuredSerializer<ListModel> {
       'name',
       serializers.serialize(object.name, specifiedType: const FullType(String)),
     ];
-    if (object.tasks != null) {
-      result
-        ..add('tasks')
-        ..add(serializers.serialize(object.tasks,
-            specifiedType: const FullType(BuiltMap,
-                const [const FullType(String), const FullType(TaskModel)])));
-    }
 
     return result;
   }
@@ -156,13 +149,6 @@ class _$ListModelSerializer implements StructuredSerializer<ListModel> {
         case 'name':
           result.name = serializers.deserialize(value,
               specifiedType: const FullType(String)) as String;
-          break;
-        case 'tasks':
-          result.tasks.replace(serializers.deserialize(value,
-              specifiedType: const FullType(BuiltMap, const [
-                const FullType(String),
-                const FullType(TaskModel)
-              ])) as BuiltMap<String, TaskModel>);
           break;
       }
     }
@@ -284,13 +270,11 @@ class _$ListModel extends ListModel {
   final String id;
   @override
   final String name;
-  @override
-  final BuiltMap<String, TaskModel> tasks;
 
   factory _$ListModel([void updates(ListModelBuilder b)]) =>
       (new ListModelBuilder()..update(updates)).build();
 
-  _$ListModel._({this.id, this.name, this.tasks}) : super._() {
+  _$ListModel._({this.id, this.name}) : super._() {
     if (id == null) throw new ArgumentError.notNull('id');
     if (name == null) throw new ArgumentError.notNull('name');
   }
@@ -306,20 +290,19 @@ class _$ListModel extends ListModel {
   bool operator ==(dynamic other) {
     if (identical(other, this)) return true;
     if (other is! ListModel) return false;
-    return id == other.id && name == other.name && tasks == other.tasks;
+    return id == other.id && name == other.name;
   }
 
   @override
   int get hashCode {
-    return $jf($jc($jc($jc(0, id.hashCode), name.hashCode), tasks.hashCode));
+    return $jf($jc($jc(0, id.hashCode), name.hashCode));
   }
 
   @override
   String toString() {
     return (newBuiltValueToStringHelper('ListModel')
           ..add('id', id)
-          ..add('name', name)
-          ..add('tasks', tasks))
+          ..add('name', name))
         .toString();
   }
 }
@@ -335,18 +318,12 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
   String get name => _$this._name;
   set name(String name) => _$this._name = name;
 
-  MapBuilder<String, TaskModel> _tasks;
-  MapBuilder<String, TaskModel> get tasks =>
-      _$this._tasks ??= new MapBuilder<String, TaskModel>();
-  set tasks(MapBuilder<String, TaskModel> tasks) => _$this._tasks = tasks;
-
   ListModelBuilder();
 
   ListModelBuilder get _$this {
     if (_$v != null) {
       _id = _$v.id;
       _name = _$v.name;
-      _tasks = _$v.tasks?.toBuilder();
       _$v = null;
     }
     return this;
@@ -365,8 +342,7 @@ class ListModelBuilder implements Builder<ListModel, ListModelBuilder> {
 
   @override
   _$ListModel build() {
-    final _$result =
-        _$v ?? new _$ListModel._(id: id, name: name, tasks: _tasks?.build());
+    final _$result = _$v ?? new _$ListModel._(id: id, name: name);
     replace(_$result);
     return _$result;
   }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:built_collection/built_collection.dart';
 import 'package:honeywouldyou/data/models.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/services.dart';
@@ -61,7 +60,7 @@ class _OnRemoveNewListEpic extends EpicClass<AppState> {
           .where((Action<dynamic, dynamic> action) =>
               action is OnRemoveListClickedAction)
           .asyncMap((Action<dynamic, dynamic> action) =>
-              _repository.remove(action.payload))
+              _repository.removeList(action.payload))
           .map((Null _) => new OnRepositoryTaskCompletedAction());
 }
 
@@ -79,11 +78,10 @@ class _OnAddNewListEpic extends EpicClass<AppState> {
       new Observable<Action<dynamic, dynamic>>(actions)
           .where((Action<dynamic, dynamic> action) =>
               action is OnAddNewListSaveClickedAction)
-          .asyncMap((Action<dynamic, dynamic> action) => _repository.add(
+          .asyncMap((Action<dynamic, dynamic> action) => _repository.addList(
               new ListModel((ListModelBuilder b) => b
                 ..id = '0'
                 ..name = action.payload
-                ..tasks = new MapBuilder<String, TaskModel>()
                 ..build()),
               store.state.authentication.currentUser.uid))
           .map((Null _) => new OnRepositoryTaskCompletedAction());
@@ -99,9 +97,6 @@ Epic<AppState> rootListsEpic({Repository repository}) =>
 
 ///
 class OnListsPageConnectedAction extends Action<Null, Null> {}
-
-///
-class OnRepositoryTaskCompletedAction extends Action<Null, Null> {}
 
 ///
 class OnDataRefreshAction extends Action<Iterable<ListModel>, Null> {

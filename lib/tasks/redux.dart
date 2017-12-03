@@ -17,8 +17,6 @@ class TasksReducer extends ReducerClass<AppState> {
     switch (action.runtimeType) {
       case OnTaskCompleteToggledAction:
         return _onTaskCompleteToggled(state, action);
-      case OnAddTaskAction:
-        return _onAddTask(state, action);
       case OnNewTasksDataAction:
         return _onNewTasksDataAction(state, action);
     }
@@ -41,26 +39,10 @@ class TasksReducer extends ReducerClass<AppState> {
   }
 
   ///
-  AppState _onAddTask(AppState state, OnAddTaskAction action) {
-    final TaskModel taskModel = new TaskModel((TaskModelBuilder b) {
-      b
-        ..id = '123'
-        ..listId = action.payload.listId
-        ..completed = false;
-      return b.name = action.payload.name;
-    });
-
-    return state.rebuild((AppStateBuilder b) => b
-      ..tasks = state.tasks
-          .rebuild((MapBuilder<String, TaskModel> b) =>
-              b.addAll(<String, TaskModel>{taskModel.id: taskModel}))
-          .toBuilder());
-  }
-
-  ///
   AppState _onNewTasksDataAction(AppState state, OnNewTasksDataAction action) =>
-      state.rebuild((AppStateBuilder b) =>
-          b..tasks.addIterable(action.payload, key: (TaskModel t) => t.id));
+      state.rebuild((AppStateBuilder b) => b.tasks
+        ..clear()
+        ..addIterable(action.payload, key: (TaskModel t) => t.id));
 }
 
 /**
@@ -79,16 +61,53 @@ class _OnTasksPageConnectedEpic extends EpicClass<AppState> {
       new Observable<Action<dynamic, dynamic>>(actions)
           .where((Action<dynamic, dynamic> action) =>
               action is OnTasksPageConnectedAction)
-          .flatMap((Action<dynamic, dynamic> action) => _repository.tasks(
-              userId: store.state.authentication.currentUser.uid,
-              listId: action.payload))
+          .flatMap((Action<dynamic, dynamic> action) => _repository
+              .tasks(listId: action.payload)
+              .defaultIfEmpty(<TaskModel>[]))
           .map((Iterable<TaskModel> tasks) => new OnNewTasksDataAction(tasks));
+}
+
+///
+class _OnAddTaskEpic extends EpicClass<AppState> {
+  final Repository _repository;
+
+  ///
+  _OnAddTaskEpic(this._repository);
+
+  @override
+  Stream<dynamic> call(Stream<dynamic> actions, EpicStore<AppState> store) =>
+      new Observable<Action<dynamic, dynamic>>(actions)
+          .where((Action<dynamic, dynamic> action) => action is OnAddTaskAction)
+          .flatMap((Action<dynamic, dynamic> action) => _repository
+              .addTask(action.payload.name, action.payload.listId)
+              .asStream()
+              .map((Null _) => new OnRepositoryTaskCompletedAction()));
+}
+
+///
+class _OnRemoveTaskEpic extends EpicClass<AppState> {
+  final Repository _repository;
+
+  ///
+  _OnRemoveTaskEpic(this._repository);
+
+  @override
+  Stream<dynamic> call(Stream<dynamic> actions, EpicStore<AppState> store) =>
+      new Observable<Action<dynamic, dynamic>>(actions)
+          .where(
+              (Action<dynamic, dynamic> action) => action is OnRemoveTaskAction)
+          .flatMap((Action<dynamic, dynamic> action) => _repository
+              .removeTask(action.payload.taskId, action.payload.listId)
+              .asStream()
+              .map((Null _) => new OnRepositoryTaskCompletedAction()));
 }
 
 ///
 Epic<AppState> rootTasksEpic({Repository repository}) =>
     combineEpics(<Epic<AppState>>[
       new _OnTasksPageConnectedEpic(repository),
+      new _OnAddTaskEpic(repository),
+      new _OnRemoveTaskEpic(repository)
     ]);
 
 /**
@@ -146,4 +165,19 @@ class OnAddTaskActionData {
 class OnAddTaskAction extends Action<OnAddTaskActionData, Null> {
   ///
   OnAddTaskAction(OnAddTaskActionData payload) : super(payload: payload);
+}
+
+class _OnRemoveTaskActionData {
+  final String listId;
+  final String taskId;
+
+  _OnRemoveTaskActionData(this.listId, this.taskId);
+}
+
+///
+class OnRemoveTaskAction extends Action<_OnRemoveTaskActionData, Null> {
+  ///
+  OnRemoveTaskAction(
+      {@required final String listId, @required final String taskId})
+      : super(payload: new _OnRemoveTaskActionData(listId, taskId));
 }

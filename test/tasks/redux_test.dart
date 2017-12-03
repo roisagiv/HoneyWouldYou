@@ -1,3 +1,4 @@
+import 'package:faker/faker.dart';
 import 'package:honeywouldyou/lists/redux.dart';
 import 'package:honeywouldyou/redux/redux.dart';
 import 'package:honeywouldyou/tasks/redux.dart';
@@ -12,7 +13,7 @@ import '../utils/utils.dart';
 void main() {
   ///
   group('tasks', () {
-    final String listId = '5a171ecc18a34083114ea3ff';
+    final String listId = '5a2422b307aae6fb9847d8c4';
 
     Store<AppState> store;
     TestableRepository repository;
@@ -36,7 +37,7 @@ void main() {
 
     ///
     test('OnTaskCompleteToggledAction', () async {
-      final String taskId = '5a171ecc046531ef20a1fe4e';
+      final String taskId = '5a2422b3a914e314b4eee423';
 
       store.dispatch(new OnTaskCompleteToggledAction(
           new OnTaskCompleteToggledData(
@@ -49,13 +50,18 @@ void main() {
 
     ///
     test('OnAddTaskAction', () async {
-      expect(store.state.tasks.length, 14);
+      expect(store.state.tasks.length, 6);
+      final String taskName = faker.randomGenerator.string(9);
+
       store.dispatch(new OnAddTaskAction(new OnAddTaskActionData(
-        name: 'name name',
+        name: taskName,
         listId: listId,
       )));
 
-      expect(store.state.tasks.length, 15);
+      await aBit();
+      expect(store.state.tasks.length, 7);
+      expect(repository.lastAddedTask.name, taskName);
+      expect(repository.lastAddedTask.listId, listId);
     });
   });
 }

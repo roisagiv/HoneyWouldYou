@@ -201,7 +201,7 @@ class ListItemWidget extends StatelessWidget {
                                 style: Theme.of(context).textTheme.body1,
                               ),
                               new Text(
-                                '${_list.tasks?.length} Tasks',
+                                '${4} Tasks',
                                 style: Theme.of(context).textTheme.caption,
                               )
                             ],

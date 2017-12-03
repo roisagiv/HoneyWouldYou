@@ -17,7 +17,7 @@ abstract class TaskModel implements Built<TaskModel, TaskModelBuilder> {
         ..id = map['_id']
         ..name = map['name']
         ..listId = listId
-        ..completed = false);
+        ..completed = map['completed']);
 
   ///
   TaskModel._();
@@ -44,21 +44,10 @@ abstract class ListModel implements Built<ListModel, ListModelBuilder> {
   factory ListModel([updates(ListModelBuilder b)]) = _$ListModel;
 
   ///
-  factory ListModel.fromMap(Map<String, dynamic> map) {
-    final String listId = map['_id'];
-
-    final Iterable<TaskModel> tasks = map['tasks']
-        .map((Map<String, dynamic> t) => new TaskModel.fromMap(t, listId));
-
-    final MapBuilder<String, TaskModel> tasksBuilder =
-        new MapBuilder<String, TaskModel>()
-          ..addIterable(tasks, key: (TaskModel t) => t.id);
-
-    return new ListModel((ListModelBuilder b) => b
-      ..name = map['title']
-      ..id = listId
-      ..tasks = tasksBuilder);
-  }
+  factory ListModel.fromMap(Map<String, dynamic> map) =>
+      new ListModel((ListModelBuilder b) => b
+        ..name = map['name']
+        ..id = map['_id']);
 
   ///
   ListModel._();
@@ -68,10 +57,6 @@ abstract class ListModel implements Built<ListModel, ListModelBuilder> {
 
   ///
   String get name;
-
-  ///
-  @nullable
-  BuiltMap<String, TaskModel> get tasks;
 
   ///
   static Serializer<ListModel> get serializer => _$listModelSerializer;
