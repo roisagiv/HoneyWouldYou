@@ -1,0 +1,25 @@
+{
+  "name": "functions",
+  "private": true,
+  "scripts": {
+    "build": "./node_modules/.bin/tslint -p tslint.json && ./node_modules/.bin/tsc",
+    "build:watch": "./node_modules/.bin/tslint -p tslint.json && ./node_modules/.bin/tsc --watch",
+    "serve": "npm run build && firebase serve --only functions",
+    "shell": "npm run build && firebase experimental:functions:shell",
+    "shell:watch": "firebase experimental:functions:shell",
+    "start": "npm run shell",
+    "start:watch": "npm run build:watch & npm run shell:watch",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "5.5.1",
+    "firebase-functions": "0.7.3"
+  },
+  "devDependencies": {
+    "firebase-tools": "3.16.0",
+    "tslint": "5.8.0",
+    "typescript": "2.6.2"
+  }
+}
