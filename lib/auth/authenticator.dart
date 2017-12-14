@@ -20,6 +20,10 @@ abstract class Authenticator {
   });
 
   ///
+  Future<Result<AuthenticatedUser>> signInWithGoogle(
+      {@required String accessToken, @required String idToken});
+
+  ///
   Future<AuthenticatedUser> currentUser();
 
   ///
@@ -92,6 +96,21 @@ class FirebaseAuthenticator implements Authenticator {
   ///
   @override
   Future<Null> signOut() => _auth.signOut();
+
+  ///
+  @override
+  Future<Result<AuthenticatedUser>> signInWithGoogle(
+      {String accessToken, String idToken}) async {
+    try {
+      final FirebaseUser user = await _auth.signInWithGoogle(
+          idToken: idToken, accessToken: accessToken);
+
+      return new Result<AuthenticatedUser>.value(
+          new FirebaseAuthenticatedUser(user));
+    } on PlatformException catch (e) {
+      return new Result<AuthenticatedUser>.error(e.details);
+    }
+  }
 }
 
 ///

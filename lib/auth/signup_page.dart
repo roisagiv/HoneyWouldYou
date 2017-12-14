@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:honeywouldyou/auth/authenticator.dart';
 import 'package:honeywouldyou/navigation.dart';
 import 'package:honeywouldyou/redux/redux.dart';
@@ -69,11 +70,8 @@ class SignUpPageState extends State<SignUpPage> {
                 value: widget._inProgress ? null : 0.0,
               )),
           new Container(
-            padding: const EdgeInsets.all(16.0),
-            child: new Container(
-              padding: const EdgeInsets.all(8.0),
-              child: _signUpForm(context, widget._errorMessage),
-            ),
+            padding: const EdgeInsets.all(24.0),
+            child: _signUpForm(context, widget._errorMessage),
           )
         ],
       ));
@@ -140,6 +138,26 @@ class SignUpPageState extends State<SignUpPage> {
                 )
               ],
             ),
+            new ListTile(
+              dense: true,
+            ),
+            new RaisedButton(
+                color: Colors.white,
+                child: new Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8.0,
+                  children: <Widget>[
+                    new Image.asset(
+                      'assets/images/google_signin_buttons/logo_googleg.png',
+                      fit: BoxFit.contain,
+                    ),
+                    new Text(
+                      'Sign in with Google',
+                      textAlign: TextAlign.center,
+                    )
+                  ],
+                ),
+                onPressed: _signUpWithGoogle),
           ],
         ),
       );
@@ -197,6 +215,32 @@ class SignUpPageState extends State<SignUpPage> {
     } else {
       widget._dispatcher(
           new OnUserAuthenticationFailedAction(result.asError.error));
+    }
+  }
+
+  Future<Null> _signUpWithGoogle() async {
+    final GoogleSignIn g = new GoogleSignIn();
+    try {
+      final GoogleSignInAccount account = await g.signIn();
+
+      final GoogleSignInAuthentication authentication =
+          await account.authentication;
+
+      final Result<AuthenticatedUser> result = await widget._authenticator
+          .signInWithGoogle(
+              accessToken: authentication.accessToken,
+              idToken: authentication.idToken);
+
+      if (result.isValue) {
+        widget._dispatcher(
+            new OnUserAuthenticationSucceedAction(result.asValue.value));
+        widget._navigation.navigateTo(context, '/');
+      } else {
+        widget._dispatcher(
+            new OnUserAuthenticationFailedAction(result.asError.error));
+      }
+    } catch (error) {
+      print(error);
     }
   }
 

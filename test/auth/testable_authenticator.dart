@@ -45,6 +45,13 @@ class TestableAuthenticator implements Authenticator {
 
   @override
   Future<Null> signOut() => null;
+
+  ///
+  @override
+  Future<Result<AuthenticatedUser>> signInWithGoogle(
+          {String accessToken, String idToken}) =>
+      new Future<Result<AuthenticatedUser>>.delayed(
+          new Duration(milliseconds: 10), () => users.removeFirst());
 }
 
 ///
